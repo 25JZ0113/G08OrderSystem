@@ -1,0 +1,6 @@
+<%@ page pageEncoding="UTF-8" %>
+<%-- 【管理者メニュー】ボタン:社員業務の画面(ホール・キッチン・レジ)のヘッダーに入れる
+     管理者端末で管理者がログインしているとき(A-02 から開いたとき)だけ表示し、A-02 へ戻れるようにする --%>
+<c:if test="${sessionScope.loginUser.admin && sessionScope.loginTerminal == 'admin'}">
+  <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/admin/menu">管理者メニュー</a>
+</c:if>

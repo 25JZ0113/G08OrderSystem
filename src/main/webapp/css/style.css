@@ -1,0 +1,2446 @@
+@charset "UTF-8";
+/* ============================================================
+   喫茶 生成り 共通スタイル
+   - 画面の配置:G08「画面レイアウト参考画像」
+   - 色・書体・余白・部品:デザインシステム「Kinari」
+   - 影・グラデーションは使わず、余白と 1px の罫線で区切る
+   - 色は必ず下の変数(トークン)で指定する
+   ============================================================ */
+
+/* ---------- トークン(ライト) ---------- */
+:root {
+  /* 色 */
+  --paper: #f7f4ee;         /* ページ背景 */
+  --paper-raised: #fdfcf9;  /* カード・入力欄 */
+  --line: #ddd7cc;          /* 罫線・区切り */
+  --line-strong: #8a8479;   /* 操作部品の枠 */
+  --ink: #24221f;           /* 本文 */
+  --ink-muted: #6b665e;     /* 補足 */
+  --accent: #2f4a6d;        /* 藍:主要操作・リンク・選択 */
+  --on-accent: #fdfcf9;     /* accent / danger の上の文字 */
+  --accent-soft: #e3e8ee;   /* 選択中の背景 */
+  --success: #4f6b45;       /* 完了 */
+  --danger: #a1443a;        /* エラー・削除 */
+  --warning-soft: #f3e8c8;  /* 準備中(清掃待ち)の背景 */
+  --focus: var(--accent);
+
+  /* 書体 */
+  --font-serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --font-sans: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  /* 余白 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-4: 16px;
+  --space-8: 32px;
+
+  /* 角丸 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-full: 9999px;
+}
+
+/* ---------- トークン(ダーク) ---------- */
+:root[data-theme="dark"] {
+  --paper: #2e2c29;
+  --paper-raised: #383531;
+  --line: #4e4a45;
+  --line-strong: #8c857c;
+  --ink: #efe9df;
+  --ink-muted: #b3aca1;
+  --accent: #9db4d3;
+  --on-accent: #1c1a17;
+  --accent-soft: #343f53;
+  --success: #9ab88c;
+  --danger: #e0907f;
+  --warning-soft: #4d4430;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #2e2c29;
+    --paper-raised: #383531;
+    --line: #4e4a45;
+    --line-strong: #8c857c;
+    --ink: #efe9df;
+    --ink-muted: #b3aca1;
+    --accent: #9db4d3;
+    --on-accent: #1c1a17;
+    --accent-soft: #343f53;
+    --success: #9ab88c;
+    --danger: #e0907f;
+    --warning-soft: #4d4430;
+  }
+}
+
+/* ---------- 基本 ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 28px;            /* body:和文は行間 1.75 */
+  background: var(--paper);
+  color: var(--ink);
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   共通ヘッダー(テーブル端末)
+   1 段目:店名と画面名 / 2 段目:テーブル番号・人数 と 右のボタン
+   ============================================================ */
+.app-header {
+  background: var(--paper-raised);
+  border-bottom: 1px solid var(--line);
+  padding: var(--space-2) var(--space-8) 12px;
+}
+
+.app-title {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.app-shop {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.app-screen {
+  font-size: 13px;              /* small */
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.app-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 32px;
+}
+
+.table-info {
+  margin: 0;
+  font-size: 15px;
+  display: flex;
+  gap: var(--space-4);
+}
+
+.table-info-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  margin-left: var(--space-1);
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ============================================================
+   ボタン
+   ============================================================ */
+.btn {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+  height: 56px;
+  min-width: 280px;
+  padding: 0 var(--space-8);
+  font-size: 18px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.btn-primary:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.btn-secondary {
+  background: var(--paper-raised);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.btn-secondary:hover {
+  background: var(--accent-soft);
+}
+
+.btn:disabled,
+.btn:disabled:hover {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink-muted);
+  cursor: not-allowed;
+}
+
+.btn-price {
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+   T-01 メニュー画面
+   左:カテゴリ一覧とカート点数 / 右:商品カード 2 列とカートボタン
+   ============================================================ */
+.menu-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+
+/* 左のカテゴリ一覧 */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-4);
+  border-right: 1px solid var(--line);
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  position: sticky;
+  top: var(--space-4);
+}
+
+.category-item {
+  display: block;
+  padding: var(--space-2) 12px;
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  font-size: 17px;
+  text-decoration: none;
+}
+
+.category-item:hover {
+  background: var(--accent-soft);
+}
+
+.category-item.is-current {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.cart-count {
+  position: sticky;
+  bottom: var(--space-4);
+  margin: 0;
+  padding: 12px var(--space-4);
+  text-align: center;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.cart-count-value {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 var(--space-1);
+}
+
+/* 右の商品一覧 */
+.menu-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  max-width: 880px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.menu-heading {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 24px;              /* heading */
+  line-height: 36px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.product-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.product-card:hover {
+  border-color: var(--accent);
+}
+
+.product-card:hover .product-name {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* 商品画像(画像がないときは「商品画像」の文字) */
+.product-image,
+.detail-image {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+}
+
+.product-image {
+  aspect-ratio: 16 / 9;
+  border-bottom: 1px solid var(--line);
+}
+
+.product-image img,
+.detail-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-image-placeholder {
+  font-size: 15px;
+  color: var(--ink-muted);
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  padding: 12px var(--space-4);
+}
+
+.product-name {
+  font-weight: 700;
+}
+
+.product-price {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--ink-muted);
+}
+
+.menu-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: var(--space-4);
+}
+
+/* ============================================================
+   T-02 商品詳細画面
+   上:戻る / 左:商品画像 / 右:商品名・説明・サイズ・数量・金額 / 右下:カートに入れる
+   ============================================================ */
+.detail-page {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-8) var(--space-8);
+}
+
+.detail-page > p {
+  margin: 0 0 var(--space-4);
+}
+
+.detail {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.detail-image {
+  aspect-ratio: 1 / 1;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.detail-name {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 28px;
+  line-height: 40px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.detail-desc {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-2);
+  color: var(--ink-muted);
+}
+
+/* 「サイズ」「数量」のラベルと操作を横に並べる行 */
+.detail-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.detail-row-top {
+  align-items: start;
+}
+
+.detail-label {
+  font-weight: 700;
+}
+
+.detail-row-top .detail-label {
+  padding-top: var(--space-1);
+}
+
+/* サイズ:つながったボタン(S | M | L) */
+.segmented {
+  display: inline-flex;
+  justify-self: start;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.segmented-item {
+  position: relative;
+  cursor: pointer;
+}
+
+.segmented-item + .segmented-item {
+  border-left: 1px solid var(--line-strong);
+}
+
+.segmented-item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented-item span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 40px;
+  padding: 0 var(--space-4);
+  background: var(--paper-raised);
+  font-weight: 700;
+}
+
+.segmented-item:hover span {
+  background: var(--accent-soft);
+}
+
+.segmented-item input:checked + span {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.segmented-item input:focus-visible + span {
+  outline: 2px solid var(--focus);
+  outline-offset: -4px;
+}
+
+/* トッピング */
+.topping-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.topping-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  cursor: pointer;
+}
+
+.topping-item input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+  flex: none;
+}
+
+.topping-price {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+
+/* 数量:[-] 1 [+] */
+.qty {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.qty-btn {
+  width: 40px;
+  padding: 0;
+  font-size: 18px;
+}
+
+.qty-input {
+  width: 56px;
+  height: 40px;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  text-align: center;
+  background: transparent;
+  color: var(--ink);
+  border: none;
+  -moz-appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 金額 */
+.detail-total {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: 28px;
+  line-height: 40px;
+  font-weight: 700;
+}
+
+/* カートに入れる(右下) */
+.detail-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+/* ============================================================
+   T-03 カート画面
+   上:メニューに戻る / 中:商品名・金額・数量・削除の行 / 下:合計と注文を確定する
+   ============================================================ */
+.cart-page {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-8) var(--space-8);
+}
+
+.cart-page > p {
+  margin: 0 0 var(--space-4);
+}
+
+.cart-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.cart-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px auto auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 12px var(--space-4);
+}
+
+.cart-row + .cart-row {
+  border-top: 1px solid var(--line);
+}
+
+.cart-row form {
+  margin: 0;
+}
+
+.cart-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cart-item-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cart-item-name:hover {
+  color: var(--accent);
+}
+
+.cart-item-toppings {
+  font-size: 13px;              /* small */
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.cart-item-price {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.cart-item-unit {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+.qty-value {
+  min-width: 32px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 18px;
+}
+
+.cart-note {
+  margin: var(--space-2) 0 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.cart-empty {
+  padding: var(--space-8) 0;
+  text-align: center;
+}
+
+.cart-footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-8);
+  background: var(--paper-raised);
+  border-top: 1px solid var(--line);
+}
+
+.cart-total {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cart-total-price {
+  margin-left: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 28px;
+}
+
+/* ============================================================
+   T-05 注文履歴画面(T-03 カートの .cart-list / .cart-footer を使う)
+   左:商品名 ×数量(下にトッピング) / 右:金額
+   ============================================================ */
+.history-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.history-name {
+  font-weight: 700;
+}
+
+.history-row.is-canceled .history-name {
+  color: var(--ink-muted);
+  text-decoration: line-through;
+}
+
+.history-tag {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+}
+
+/* ============================================================
+   T-06 会計依頼画面
+   未提供あり:黄の帯 + 未提供の商品の表(T-04 の .status-table)
+   会計可能 :お会計金額を大きく + レジへの案内
+   ============================================================ */
+.checkout-warning {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 700;
+  text-align: center;
+  background: var(--warning-soft);
+  border-radius: var(--radius-md);
+}
+
+.checkout-message {
+  margin: var(--space-8) 0 0;
+  font-size: 18px;
+  line-height: 28px;
+  text-align: center;
+}
+
+.checkout-ready {
+  padding: var(--space-8) 0;
+  text-align: center;
+}
+
+.checkout-label {
+  margin: 0;
+  font-size: 18px;
+  color: var(--ink-muted);
+}
+
+.checkout-amount {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: 48px;
+  line-height: 64px;
+  font-weight: 700;
+}
+
+/* ============================================================
+   T-04 注文状況画面
+   上:メニューに戻る / 表:商品名・数量・注文状態
+   ============================================================ */
+.status-page {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-8) var(--space-8);
+}
+
+.page-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.status-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.status-table th,
+.status-table td {
+  padding: 12px var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.status-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status-table th {
+  font-size: 13px;              /* small */
+  line-height: 20px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  background: var(--paper);
+}
+
+.status-table .num {
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
+.status-table .col-qty {
+  width: 96px;
+}
+
+.status-table .col-status {
+  width: 200px;
+}
+
+.status-name {
+  display: block;
+  font-weight: 700;
+}
+
+.status-toppings {
+  display: block;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.status-table tr.is-canceled .status-name {
+  color: var(--ink-muted);
+  text-decoration: line-through;
+}
+
+.status-empty {
+  padding: var(--space-8) 0;
+  text-align: center;
+}
+
+/* ============================================================
+   K-01 調理待ち一覧画面(T-04 の .status-table を使い、列を増やす)
+   注文時刻・テーブル・商品名・数量・状態・操作
+   ============================================================ */
+.kitchen-page {
+  max-width: 1120px;
+}
+
+.kitchen-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+/* H-03:左に【席状況に戻る】、その右に見出し */
+.heading-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.section-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 700;
+}
+
+.kitchen-table .col-time  { width: 136px; }
+.kitchen-table .col-table { width: 128px; }
+.kitchen-table .col-qty   { width: 80px; }
+.kitchen-table .col-state { width: 168px; }
+.kitchen-table .col-action { width: 184px; }
+
+.kitchen-table td {
+  vertical-align: middle;
+}
+
+/* 離れた場所からも読めるように、テーブル番号と数量は大きく */
+.kitchen-table td.num {
+  font-size: 18px;
+}
+
+.kitchen-table .kitchen-qty {
+  font-weight: 700;
+}
+
+/* 調理中の行は少し色を付けて、受付済みと区別する */
+.kitchen-table tr.is-cooking td {
+  background: var(--accent-soft);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.kitchen-note {
+  margin: var(--space-4) 0 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+/* ============================================================
+   H-01 席状況画面
+   15 台のテーブルを 5 列 × 3 段のタイルで表示する
+   空席 = 白 / 利用中 = 藍の薄い色 / 準備中(清掃待ち)= 黄の薄い色
+   ============================================================ */
+.hall-guide {
+  margin: 0 0 var(--space-4);
+  color: var(--ink-muted);
+}
+
+.seat-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-4);
+}
+
+.seat-grid > li {
+  display: flex;
+}
+
+.seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  padding: var(--space-4) var(--space-2);
+  font: inherit;
+  color: var(--ink);
+  text-align: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--paper-raised);
+}
+
+.seat-no {
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 700;
+}
+
+.seat-state {
+  font-size: 16px;
+}
+
+.seat-vacant {
+  background: var(--paper-raised);
+}
+
+.seat-in-use {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+
+.seat-in-use .seat-state {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.seat-preparing {
+  background: var(--warning-soft);
+  border-color: var(--line-strong);
+}
+
+/* タイルの中のボタン(【人数を変更する】【清掃完了にする】。押せるのはこのボタンだけ) */
+.seat-btn {
+  margin-top: var(--space-1);
+}
+
+/* ============================================================
+   H-02 人数変更画面(T-08 人数入力の部品を使う)
+   ============================================================ */
+.guest-change {
+  margin-top: var(--space-4);
+}
+
+.guest-change-current {
+  display: flex;
+  gap: var(--space-8);
+  margin: 0;
+  font-size: 20px;
+  line-height: 32px;
+}
+
+.guest-change-current strong {
+  font-size: 24px;
+}
+
+.seat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  font-size: 14px;
+}
+
+.legend-title {
+  font-weight: 700;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 720px) {
+  .seat-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---------- 確認ダイアログ(H-01 清掃完了) ---------- */
+.confirm-dialog {
+  width: min(480px, calc(100% - 32px));
+  padding: var(--space-8);
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(36, 34, 31, 0.45);
+}
+
+.confirm-title {
+  margin: 0 0 var(--space-4);
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+.confirm-table {
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.confirm-change {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.confirm-change .tag {
+  height: 32px;
+  padding: 0 var(--space-4);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.confirm-change .confirm-from {
+  background: var(--warning-soft);
+}
+
+.confirm-arrow {
+  font-size: 20px;
+  color: var(--ink-muted);
+}
+
+.confirm-points {
+  margin: 0 0 var(--space-8);
+  padding-left: 1.25em;
+  line-height: 26px;
+}
+
+.confirm-points li + li {
+  margin-top: var(--space-2);
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-4);
+}
+
+.confirm-actions .btn {
+  min-width: 128px;
+}
+
+/* ============================================================
+   タグ(状態などの小さなラベル。押せる部品ではない)
+   ============================================================ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 24px;
+  padding: 0 var(--space-2);
+  font-size: 13px;
+  line-height: 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.tag-accent {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tag-success {
+  background: transparent;
+  border-color: var(--success);
+  color: var(--success);
+  font-weight: 700;
+}
+
+.tag-muted {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-muted);
+}
+
+/* ============================================================
+   T-08 人数入力画面
+   いらっしゃいませ / ご利用の人数 / [-] 2 [+] 人 / 注文をはじめる / 注記
+   ============================================================ */
+.welcome-page {
+  flex: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.welcome-title {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-serif);
+  font-size: 40px;              /* display */
+  line-height: 56px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.welcome-lead {
+  margin: 0;
+  font-size: 18px;
+}
+
+.welcome-note {
+  margin: var(--space-4) 0 0;
+  font-size: 13px;              /* small */
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.welcome-note code {
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+
+.guest-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.guest-qty {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.guest-btn {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  font-size: 28px;
+}
+
+.guest-input {
+  width: 96px;
+  height: 64px;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 32px;
+  text-align: center;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  -moz-appearance: textfield;
+}
+
+.guest-input::-webkit-outer-spin-button,
+.guest-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.guest-unit {
+  font-size: 20px;
+}
+
+/* ============================================================
+   S-01 テーブル番号確認画面(T-08 の .welcome-page を使う)
+   この端末のテーブル番号 / [ 5 ] / 確認の案内 / 【変更する】【確定する】
+   ============================================================ */
+.table-no-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 160px;
+  height: 96px;
+  margin: var(--space-4) 0;
+  padding: 0 var(--space-8);
+  font-family: var(--font-mono);
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: var(--radius-md);
+}
+
+.table-confirm-actions {
+  display: flex;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+.table-confirm-actions .btn {
+  min-width: 176px;
+}
+
+/* S-02 テーブル番号変更画面 */
+.table-change-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.table-no-input {
+  width: 160px;
+  height: 80px;
+  font-size: 40px;
+}
+
+/* ============================================================
+   A-01 ログイン画面
+   ============================================================ */
+.login-title {
+  font-size: 28px;
+  line-height: 40px;
+}
+
+.login-form {
+  display: grid;
+  grid-template-columns: auto 280px;
+  align-items: center;
+  gap: var(--space-4);
+  margin: var(--space-4) 0 var(--space-8);
+  text-align: left;
+}
+
+.login-input {
+  height: 48px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+.login-input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.login-submit {
+  grid-column: 1 / -1;
+  justify-self: center;
+  min-width: 200px;
+  margin-top: var(--space-4);
+}
+
+/* ============================================================
+   R-01〜R-03 レジ端末
+   ============================================================ */
+.register-login {
+  margin: 0 var(--space-4);
+}
+
+/* R-01 テーブル番号入力:入力欄 + テンキー */
+.register-table-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: var(--space-2);
+}
+
+.keypad-key {
+  height: 56px;
+  font-size: 20px;
+}
+
+/* R-02 未提供警告:下のボタン */
+.register-actions {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+.register-action-with-note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.register-action-note {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+/* R-03 会計:左に明細、右に支払い */
+.register-pay {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-8) var(--space-8);
+}
+
+.register-pay-alert {
+  grid-column: 1 / -1;
+}
+
+.register-bill-table .col-amount {
+  width: 128px;
+}
+
+.register-bill-table .amount,
+.receipt .amount {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.register-sum {
+  margin: var(--space-4) 0 0;
+}
+
+.register-sum div {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-1) var(--space-4);
+}
+
+.register-sum dt,
+.register-sum dd {
+  margin: 0;
+}
+
+.register-sum dd {
+  font-family: var(--font-mono);
+}
+
+.register-tax {
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+
+.register-total {
+  margin-top: var(--space-2);
+  padding-top: var(--space-4) !important;
+  border-top: 1px solid var(--line-strong);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.register-total dd {
+  font-size: 28px;
+}
+
+.register-payment {
+  padding-left: var(--space-8);
+  border-left: 1px solid var(--line);
+}
+
+.register-payment form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.register-methods {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.register-legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-weight: 700;
+}
+
+/* 支払方法は3つを同じ幅で横いっぱいに並べる(文字は折り返さない) */
+.register-methods .segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+}
+
+.register-methods .segmented-item span {
+  min-width: 0;
+  height: 48px;
+  padding: 0 var(--space-2);
+  white-space: nowrap;
+}
+
+/* 画面が狭いときは明細と支払いを縦に並べる(明細の商品名がつぶれないように) */
+@media (max-width: 960px) {
+  .register-pay {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--space-4);
+  }
+
+  .register-payment {
+    padding: var(--space-8) 0 0;
+    border-left: none;
+    border-top: 1px solid var(--line);
+  }
+}
+
+.register-cash {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.register-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+}
+
+.register-received {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.register-input {
+  width: 160px;
+  height: 48px;
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  text-align: right;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+.register-change {
+  font-family: var(--font-mono);
+  font-size: 28px;
+}
+
+.register-cash-note,
+.register-pay-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.register-pay-note {
+  text-align: center;
+}
+
+/* ============================================================
+   A-02 管理者メニュー
+   管理機能 / 社員業務 をそれぞれ大きいボタン3つ+説明で並べる
+   ============================================================ */
+.admin-menu {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.admin-menu section + section {
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--line);
+}
+
+.admin-menu-title {
+  margin-bottom: var(--space-4);
+}
+
+.admin-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-menu-btn {
+  width: 100%;
+  height: 88px;
+  font-size: 20px;
+  white-space: normal;
+}
+
+.admin-menu-note {
+  margin: var(--space-2) 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.admin-menu-foot {
+  margin: var(--space-4) 0 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .admin-menu {
+    padding: var(--space-4);
+  }
+
+  .admin-menu-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .admin-menu-btn {
+    height: 64px;
+  }
+}
+
+/* ============================================================
+   A-03 ユーザー管理
+   左:ユーザー一覧 / 右:ユーザー情報の入力欄と【登録】【変更】【削除】
+   ============================================================ */
+.admin-users {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-content: start;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-8) var(--space-8);
+}
+
+.admin-users-alert {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.admin-users-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.admin-users-table .col-login       { width: 120px; }
+.admin-users-table .col-role        { width: 88px; }
+.admin-users-table .col-user-status { width: 112px; }
+.admin-users-table .col-select      { width: 104px; }
+
+.admin-users-table td {
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.admin-users-login {
+  font-family: var(--font-mono);
+}
+
+.admin-users-table tr.is-selected td {
+  background: var(--accent-soft);
+}
+
+.admin-users-me {
+  margin-left: var(--space-1);
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.admin-users-form {
+  padding-left: var(--space-8);
+  border-left: 1px solid var(--line);
+}
+
+.admin-users-mode {
+  margin-left: var(--space-2);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+.admin-users-form form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.admin-field {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.admin-field .segmented {
+  justify-self: stretch;        /* 入力欄と同じ幅にする */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.admin-field .segmented-item span {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* 自分の権限・利用状態は変えられないので薄く表示する */
+.admin-field .segmented.is-locked {
+  opacity: 0.6;
+}
+
+.admin-field .segmented.is-locked .segmented-item {
+  cursor: not-allowed;
+}
+
+.admin-users-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.admin-users-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--on-accent);
+}
+
+.btn-danger:hover {
+  filter: brightness(0.92);
+}
+
+@media (max-width: 960px) {
+  .admin-users {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--space-4);
+  }
+
+  .admin-users-form {
+    padding: var(--space-8) 0 0;
+    border-left: none;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* ============================================================
+   A-04 メニュー(商品)管理
+   左:カテゴリ / 右上:商品一覧 / 右下:商品情報とトッピング
+   ============================================================ */
+.admin-products {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  align-content: start;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-8) var(--space-8);
+}
+
+.admin-wide {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.admin-categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-right: var(--space-8);
+  border-right: 1px solid var(--line);
+}
+
+.admin-block-title {
+  margin-top: var(--space-4);
+}
+
+.admin-category-list {
+  margin: 0;
+  padding: var(--space-2);
+  list-style: none;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.admin-category-list a {
+  display: block;
+  padding: var(--space-2) 12px;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.admin-category-list a:hover {
+  background: var(--accent-soft);
+}
+
+.admin-category-list a.is-selected {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.admin-category-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.admin-category-form .login-input {
+  height: 40px;
+}
+
+.admin-category-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.admin-category-buttons .btn {
+  padding: 0;
+}
+
+.admin-products-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.admin-products-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+/* 一覧は枠の中でスクロールし、見出しの行は上に固定する */
+.admin-table-scroll {
+  max-height: 336px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.admin-table-scroll .status-table {
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.admin-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.admin-products-table .col-price  { width: 112px; }
+.admin-products-table .col-tax    { width: 72px; }
+.admin-products-table .col-sales  { width: 112px; }
+.admin-products-table .col-select { width: 104px; }
+
+.admin-products-table td {
+  vertical-align: middle;
+}
+
+.admin-products-table .amount {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.admin-products-table tr.is-selected td {
+  background: var(--accent-soft);
+}
+
+.admin-empty {
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.admin-product-form {
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--line);
+}
+
+.admin-product-form form {
+  margin-top: var(--space-4);
+}
+
+/* 入力欄は2列に並べる(説明・画像は横いっぱい) */
+.admin-product-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4) var(--space-8);
+}
+
+.admin-field-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-field select.login-input {
+  width: 100%;
+}
+
+.admin-price {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.admin-price .login-input {
+  width: 100%;
+  min-width: 0;
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.admin-price span {
+  white-space: nowrap;
+}
+
+.admin-image {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.admin-image .login-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-image-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 128px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.admin-product-buttons {
+  max-width: 480px;
+}
+
+.admin-product-form .admin-users-note {
+  margin-top: var(--space-2);
+}
+
+.admin-toppings {
+  margin-top: var(--space-8);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--line);
+}
+
+.admin-toppings-title {
+  margin: 0 0 var(--space-2);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.admin-topping-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper-raised);
+}
+
+.admin-topping-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-topping-list form {
+  margin: 0;
+}
+
+.admin-topping-list li:last-child {
+  border-bottom: none;
+}
+
+.admin-topping-list .tag {
+  margin-left: var(--space-2);
+}
+
+.admin-topping-add {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.admin-topping-add .login-input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+}
+
+@media (max-width: 960px) {
+  .admin-products {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--space-4);
+  }
+
+  .admin-categories {
+    padding: 0 0 var(--space-8);
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .admin-product-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ============================================================
+   A-05 売上管理
+   期間と【集計】 / 日別・曜日別・月別・商品別 / 売上状況5つ / 集計表と棒グラフ
+   棒グラフは 1 系列なので色は藍 1 色。棒は細めにして上だけ角を丸め、間に 2px のすき間を空ける
+   ============================================================ */
+.admin-sales {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-8) var(--space-8);
+}
+
+.admin-sales .alert {
+  margin: 0;
+}
+
+.admin-sales-period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) 12px;
+}
+
+.admin-sales-period > a {
+  margin-right: auto;
+}
+
+.admin-sales-period .login-input {
+  height: 40px;
+  font-family: var(--font-mono);
+}
+
+.admin-sales-tabs {
+  display: inline-flex;
+  align-self: flex-start;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.admin-sales-tabs a {
+  min-width: 88px;
+  padding: var(--space-2) var(--space-4);
+  text-align: center;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.admin-sales-tabs a + a {
+  border-left: 1px solid var(--line-strong);
+}
+
+.admin-sales-tabs a:hover {
+  background: var(--accent-soft);
+}
+
+.admin-sales-tabs a.is-current {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* 売上状況:5つを横に並べる */
+.admin-sales-kpis {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.admin-sales-kpis div {
+  padding: 12px var(--space-4);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.admin-sales-kpis dt {
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.admin-sales-kpis dd {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+.admin-sales-kpis small {
+  margin-left: 2px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+.admin-sales-body {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.admin-sales-scroll {
+  max-height: 420px;
+}
+
+/* 数量・客数と金額の列は幅を決め、残りを日付・商品名に使う */
+.admin-sales-table thead th:nth-child(2) { width: 72px; }
+.admin-sales-table thead th:nth-child(3) { width: 112px; }
+
+.admin-sales-table td,
+.admin-sales-table th {
+  padding: var(--space-2) var(--space-4);
+}
+
+.admin-sales-table .amount {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.admin-sales-table tfoot th {
+  position: sticky;
+  bottom: 0;
+  color: var(--ink);
+  font-size: 14px;
+  background: var(--paper);
+  border-top: 1px solid var(--line-strong);
+}
+
+.admin-sales-chart {
+  padding-left: var(--space-8);
+  border-left: 1px solid var(--line);
+}
+
+.admin-sales-chart .section-title {
+  margin-bottom: var(--space-4);
+}
+
+.admin-chart-empty {
+  padding: var(--space-8) 0;
+}
+
+/* 縦向きの棒(日別・曜日別・月別) */
+.vbar-chart {
+  display: grid;
+  grid-template-columns: repeat(var(--bar-count), minmax(0, 1fr));
+  gap: 2px;
+  height: 280px;
+  border-bottom: 1px solid var(--line-strong);   /* 0 円の基準線 */
+}
+
+.vbar-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  outline: none;
+}
+
+.vbar-area {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.vbar {
+  width: 100%;
+  max-width: 40px;
+  min-height: 0;
+  background: var(--accent);
+  border-radius: 4px 4px 0 0;
+}
+
+.vbar-col:hover .vbar,
+.vbar-col:focus-visible .vbar {
+  filter: brightness(1.25);
+}
+
+.vbar-col:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* 目盛りの文字は基準線の下に出す */
+.vbar-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-top: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+/* 棒に重ねる・フォーカスすると出る吹き出し */
+.vbar-tip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% - 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: var(--space-2) 12px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink);
+  white-space: nowrap;
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+.vbar-tip strong {
+  font-family: var(--font-mono);
+}
+
+.vbar-col:hover .vbar-tip,
+.vbar-col:focus .vbar-tip {
+  display: block;
+}
+
+/* 横向きの棒(商品別) */
+.hbar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hbar-row {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) 80px;
+  align-items: center;
+  gap: 12px;
+}
+
+.hbar-label {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hbar-track {
+  height: 16px;
+  border-left: 1px solid var(--line-strong);   /* 0 円の基準線 */
+}
+
+.hbar {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 0 4px 4px 0;
+}
+
+.hbar-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: right;
+}
+
+@media (max-width: 960px) {
+  .admin-sales {
+    padding: var(--space-4);
+  }
+
+  .admin-sales-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-sales-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-sales-chart {
+    padding: var(--space-8) 0 var(--space-8);
+    border-left: none;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* レシート:画面では出さず、印刷するときだけ出す */
+.receipt {
+  display: none;
+}
+
+@media print {
+  body > *:not(main),
+  .register-pay > *:not(.receipt) {
+    display: none !important;
+  }
+
+  .register-pay {
+    display: block;
+    padding: 0;
+  }
+
+  .receipt {
+    display: block;
+    width: 72mm;
+    font-size: 12px;
+    color: #000;
+  }
+
+  .receipt-shop {
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .receipt table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+}
+
+/* ============================================================
+   メッセージ
+   ============================================================ */
+.alert {
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  padding: 12px var(--space-4);
+  margin: 0 0 var(--space-4);
+}
+
+.alert-danger {
+  border-color: var(--danger);
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.alert-success {
+  border-color: var(--success);
+  color: var(--success);
+  font-weight: 700;
+}
+
+.empty {
+  color: var(--ink-muted);
+}
+
+/* ============================================================
+   狭い画面(縦向きタブレット・スマートフォン)
+   ============================================================ */
+@media (max-width: 720px) {
+  .app-header {
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .app-header-row {
+    flex-wrap: wrap;
+  }
+
+  .menu-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    padding: var(--space-4);
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    gap: var(--space-4);
+  }
+
+  .category-list {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .menu-main,
+  .detail-page {
+    padding: var(--space-4);
+  }
+
+  .detail {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .btn-lg {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .cart-page {
+    padding: var(--space-4);
+  }
+
+  .cart-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cart-footer {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-4);
+  }
+}

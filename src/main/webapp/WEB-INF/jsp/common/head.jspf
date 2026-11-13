@@ -1,0 +1,8 @@
+<%@ page pageEncoding="UTF-8" %>
+<%-- 全画面共通の <head> の中身(書体と CSS)。各 JSP から <%@ include %> で読み込む --%>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Shippori+Mincho:wght@600&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">

@@ -1,0 +1,32 @@
+<%@ page pageEncoding="UTF-8" %>
+<%-- テーブル端末(T-01〜)共通のヘッダー
+     使う側で screenTitle(画面名)と showActions(右のボタンを出すか)を c:set してから include する
+     showHomeLink を true にすると、右に【入口ページに戻る】を出す(S-01 テーブル番号確認・T-07 待機で使う)
+     テーブル番号・人数はセッションから表示する(T-08 人数入力で設定) --%>
+<header class="app-header">
+  <p class="app-title">
+    <span class="app-shop">喫茶 生成り</span>
+    <span class="app-screen"><c:out value="${screenTitle}" /></span>
+  </p>
+  <div class="app-header-row">
+    <p class="table-info">
+      テーブル番号:<span class="table-info-value"><c:out value="${empty sessionScope.tableNo ? '-' : sessionScope.tableNo}" /></span>
+      <%-- 人数は入力(T-08)が済んでから表示する --%>
+      <c:if test="${not empty sessionScope.guestCount}">
+        人数:<span class="table-info-value"><c:out value="${sessionScope.guestCount}" /></span>
+      </c:if>
+    </p>
+    <c:if test="${showActions}">
+      <nav class="header-actions" aria-label="注文メニュー">
+        <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/orderStatus">注文状況</a>
+        <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/orderHistory">注文履歴</a>
+        <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/checkout">会計</a>
+      </nav>
+    </c:if>
+    <c:if test="${showHomeLink}">
+      <div class="header-actions">
+        <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/">入口ページに戻る</a>
+      </div>
+    </c:if>
+  </div>
+</header>

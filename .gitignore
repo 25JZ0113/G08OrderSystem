@@ -1,0 +1,7 @@
+# Eclipse のビルド結果
+build/
+bin/
+
+# 学校の Oracle の接続情報(本物の ID・パスワード)が入るので上げない
+# DBManager.java.example をコピーして DBManager.java を作り、接続情報を書き込む
+src/main/java/util/DBManager.java
