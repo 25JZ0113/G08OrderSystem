@@ -141,7 +141,8 @@ public class OrderDetailDAO {
 
     /**
      * R-02 未提供の商品を取り消す(商品と、それに付いたトッピングをまとめて取り消す)
-     * 注文受付済み・調理中・調理済み(提供待ち)のどれでも → キャンセル(請求なし)。合計金額に含めない
+     * 注文受付済み              → キャンセル(請求なし)。合計金額に含めない
+     * 調理中・調理済み(提供待ち) → キャンセル(請求あり)。合計金額に含める
      * 取り消した社員と日時を記録し、注文の合計金額を計算し直す
      * 画面を表示したときの状態(expectedStatus)から変わっていたら取り消さない
      * (例:その間に提供済みになっていた)
@@ -149,12 +150,10 @@ public class OrderDetailDAO {
      * @return 変更後の注文状態。状態が変わっていて取り消せなかったときは null
      */
     public String cancel(int orderId, int detailId, String expectedStatus, int userId) throws SQLException {
-        if (!OrderDetail.RECEIVED.equals(expectedStatus)
-                && !OrderDetail.COOKING.equals(expectedStatus)
-                && !OrderDetail.COOKED.equals(expectedStatus)) {
+        String to = OrderDetail.canceledStatusOf(expectedStatus);
+        if (to == null) {
             return null;   // 提供済み・取り消し済みは取り消せない
         }
-        String to = OrderDetail.CANCELED_NO_CHARGE;   // 取り消しは料金を請求しない
 
         String updateDetail =
                 """

@@ -8,7 +8,8 @@ import java.util.TreeMap;
 
 /**
  * R-03 会計画面・レシートに出す内容
- * 取り消した商品(キャンセル(請求なし))は明細に出さず、合計にも含めない
+ * キャンセル(請求なし)の商品は明細に出さず、合計にも含めない
+ * キャンセル(請求あり)の商品は明細に出し(状態も表示する)、合計に含める
  * 価格は税込なので、合計金額の中に含まれる消費税(内消費税)を税率ごとに計算する
  */
 public class Bill implements Serializable {
@@ -24,8 +25,8 @@ public class Bill implements Serializable {
         // 税率ごとの金額(トッピングの税率が商品と違っても正しく計算できるように明細ごとに足す)
         Map<Integer, Integer> amountByRate = new TreeMap<>();
         for (OrderLine line : allLines) {
-            if (line.getDetail().isCanceled()) {
-                continue;   // 取り消した商品は請求しない
+            if (line.getDetail().isNoCharge()) {
+                continue;   // キャンセル(請求なし)の商品は請求しない
             }
             lines.add(line);
             add(amountByRate, line.getDetail());
@@ -44,7 +45,7 @@ public class Bill implements Serializable {
     }
 
     private static void add(Map<Integer, Integer> amountByRate, OrderDetail d) {
-        if (d.isCanceled()) {
+        if (d.isNoCharge()) {
             return;
         }
         amountByRate.merge(d.getTaxRate(), d.getSalePrice() * d.getQuantity(), Integer::sum);

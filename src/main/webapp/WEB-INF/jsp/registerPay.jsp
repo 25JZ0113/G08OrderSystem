@@ -53,6 +53,10 @@
                 <span class="status-name">
                   <c:out value="${d.productName}" /><c:if test="${not empty d.sizeName}">(<c:out value="${d.sizeName}" />)</c:if>
                 </span>
+                <%-- キャンセル(請求あり)の商品は、取り消したことが分かるように状態も出す --%>
+                <c:if test="${d.canceled}">
+                  <span class="tag tag-muted"><c:out value="${d.orderStatus}" /></span>
+                </c:if>
                 <c:if test="${not empty line.toppings}">
                   <span class="status-toppings">
                     <c:forEach var="t" items="${line.toppings}" varStatus="st">
@@ -132,7 +136,7 @@
             <tr>
               <td><c:out value="${line.detail.productName}" /><c:if test="${not empty line.detail.sizeName}">(<c:out value="${line.detail.sizeName}" />)</c:if>
                 <c:forEach var="t" items="${line.toppings}"> +<c:out value="${t.productName}" /></c:forEach>
-                ×${line.detail.quantity}</td>
+                ×${line.detail.quantity}<c:if test="${line.detail.canceled}"> <c:out value="${line.detail.orderStatus}" /></c:if></td>
               <td class="amount"><fmt:formatNumber value="${line.amount}" />円</td>
             </tr>
           </c:forEach>
