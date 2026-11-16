@@ -15,6 +15,24 @@ public class OrderDetail implements Serializable {
     public static final String COOKED             = "調理済み(提供待ち)";
     public static final String SERVED             = "提供済み";
     public static final String CANCELED_NO_CHARGE = "キャンセル(請求なし)";
+    public static final String CANCELED_CHARGE    = "キャンセル(請求あり)";
+
+    /**
+     * 会計時に未提供の商品を取り消したときの注文状態(設計書 12 章)
+     *   注文受付済み              → キャンセル(請求なし)。合計金額に含めない
+     *   調理中・調理済み(提供待ち) → キャンセル(請求あり)。合計金額に含める
+     *
+     * @return 取り消し後の注文状態。取り消せない状態(提供済み・取り消し済み)のときは null
+     */
+    public static String canceledStatusOf(String orderStatus) {
+        if (RECEIVED.equals(orderStatus)) {
+            return CANCELED_NO_CHARGE;
+        }
+        if (COOKING.equals(orderStatus) || COOKED.equals(orderStatus)) {
+            return CANCELED_CHARGE;
+        }
+        return null;
+    }
 
     private int       id;
     private int       orderId;
@@ -59,8 +77,13 @@ public class OrderDetail implements Serializable {
         this.tableNo = tableNo;
     }
 
-    /** 取り消し済みか(キャンセル(請求なし)) */
+    /** 取り消し済みか(キャンセル(請求なし)・キャンセル(請求あり)) */
     public boolean isCanceled() {
+        return CANCELED_NO_CHARGE.equals(orderStatus) || CANCELED_CHARGE.equals(orderStatus);
+    }
+
+    /** 料金を請求しない明細か(キャンセル(請求なし))。合計金額・売上に含めない */
+    public boolean isNoCharge() {
         return CANCELED_NO_CHARGE.equals(orderStatus);
     }
 

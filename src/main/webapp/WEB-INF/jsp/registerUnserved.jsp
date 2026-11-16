@@ -60,8 +60,17 @@
               <td><span class="tag"><c:out value="${d.orderStatus}" /></span></td>
               <td>
                 <%-- 表示していた状態も送る(その間に調理が始まっていたら取り消さない) --%>
-                <c:set var="confirmText"
-                       value="「${d.productName}」を取り消します。料金は請求しません。よろしいですか?" />
+                <%-- 注文受付済みは請求なし、調理中・調理済み(提供待ち)は請求あり(設計書 12 章) --%>
+                <c:choose>
+                  <c:when test="${d.orderStatus == '注文受付済み'}">
+                    <c:set var="confirmText"
+                           value="「${d.productName}」を取り消します。料金は請求しません。よろしいですか?" />
+                  </c:when>
+                  <c:otherwise>
+                    <c:set var="confirmText"
+                           value="「${d.productName}」を取り消します。調理を始めているため、料金は請求します。よろしいですか?" />
+                  </c:otherwise>
+                </c:choose>
                 <form method="post" action="${ctx}/register/unserved" class="cancel-form"
                       data-confirm="<c:out value='${confirmText}' />">
                   <input type="hidden" name="orderId" value="${order.id}">
@@ -76,7 +85,8 @@
       </table>
 
       <p class="kitchen-note">
-        ※取り消した商品は、調理中・調理済みでも料金を請求しません<br>
+        ※注文受付済みの商品を取り消すと「キャンセル(請求なし)」になり、料金は請求しません<br>
+        ※調理中・調理済み(提供待ち)の商品を取り消すと「キャンセル(請求あり)」になり、料金は請求します<br>
         ※取り消した社員と日時を記録します(管理者の承認は不要)
       </p>
     </c:when>

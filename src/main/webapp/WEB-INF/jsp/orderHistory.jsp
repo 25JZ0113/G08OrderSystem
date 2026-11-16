@@ -32,7 +32,7 @@
       <ul class="cart-list">
         <c:forEach var="line" items="${lines}">
           <c:set var="d" value="${line.detail}" />
-          <li class="cart-row history-row ${d.canceled ? 'is-canceled' : ''}">
+          <li class="cart-row history-row ${d.noCharge ? 'is-canceled' : ''}">
             <div class="cart-item">
               <span class="history-name">
                 <c:out value="${d.productName}" /><c:if test="${not empty d.sizeName}">(<c:out value="${d.sizeName}" />)</c:if>
@@ -45,7 +45,8 @@
                   </c:forEach>
                 </span>
               </c:if>
-              <%-- 取り消された商品は状態も出す(料金は請求しないので 0 円) --%>
+              <%-- 取り消された商品は状態も出す
+                   (キャンセル(請求なし)は 0 円で取り消し線、キャンセル(請求あり)は料金を請求する) --%>
               <c:if test="${d.canceled}">
                 <span class="tag tag-muted history-tag"><c:out value="${d.orderStatus}" /></span>
               </c:if>

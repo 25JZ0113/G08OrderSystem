@@ -15,13 +15,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import dao.OrderDAO;
 import dao.OrderDetailDAO;
 import model.Order;
+import model.OrderDetail;
 import model.OrderLine;
 import model.User;
 
 /**
  * R-02 未提供警告画面(Controller)
  * GET : 未提供の商品名・数量・状態と、商品ごとの【取り消す】を表示する (register/unserved?orderId=1)
- * POST: 商品を取り消す。どの状態からでも「キャンセル(請求なし)」にし、料金は請求しない
+ * POST: 商品を取り消す(設計書 12 章)
+ *       注文受付済み              → 「キャンセル(請求なし)」。料金は請求しない
+ *       調理中・調理済み(提供待ち) → 「キャンセル(請求あり)」。料金は請求する
  *       取り消した社員(ログイン中のユーザー)と日時を記録する
  */
 @WebServlet("/register/unserved")
@@ -57,8 +60,11 @@ public class RegisterUnservedServlet extends HttpServlet {
 
         // POST の結果
         String result = request.getParameter("result");
-        if ("canceled".equals(result)) {
+        if ("canceledNoCharge".equals(result)) {
             request.setAttribute("successMessage", "取り消しました(料金は請求しません)。");
+        }
+        else if ("canceledCharge".equals(result)) {
+            request.setAttribute("successMessage", "取り消しました(調理を始めていたため、料金は請求します)。");
         }
         else if ("conflict".equals(result)) {
             request.setAttribute("errorMessage", "商品の状態が変わっていたため、取り消していません。最新の状態を確認してください。");
@@ -83,7 +89,16 @@ public class RegisterUnservedServlet extends HttpServlet {
         try {
             String to = new OrderDetailDAO().cancel(orderId, detailId, status, user.getId());
             // PRG:結果はリダイレクトのパラメータで伝える
-            String result = (to == null) ? "conflict" : "canceled";
+            String result;
+            if (to == null) {
+                result = "conflict";
+            }
+            else if (OrderDetail.CANCELED_CHARGE.equals(to)) {
+                result = "canceledCharge";
+            }
+            else {
+                result = "canceledNoCharge";
+            }
             response.sendRedirect(back + "&result=" + result);
         } catch (SQLException e) {
             e.printStackTrace();
