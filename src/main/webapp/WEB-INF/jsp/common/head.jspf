@@ -1,7 +1,12 @@
 <%@ page pageEncoding="UTF-8" %>
-<%-- 全画面共通の <head> の中身(書体と CSS)。各 JSP から <%@ include %> で読み込む --%>
+<%-- 全画面共通の <head> の中身(ファビコン・書体・CSS)。各 JSP から <%@ include %> で読み込む --%>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<%-- ファビコン(喫茶 生成り のサイトと同じ、藍の地に白い線のコーヒーカップ)。SVG に対応していないブラウザは PNG を使う --%>
+<link rel="icon" href="${pageContext.request.contextPath}/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="${pageContext.request.contextPath}/img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="${pageContext.request.contextPath}/img/apple-touch-icon.png">
+<meta name="theme-color" content="#2f4a6d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Shippori+Mincho:wght@600&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
