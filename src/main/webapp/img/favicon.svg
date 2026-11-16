@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 喫茶 生成り のファビコン:藍の地に、生成り色のコーヒーカップと湯気 -->
+  <rect width="64" height="64" rx="14" fill="#2f4a6d"/>
+  <g fill="none" stroke="#f7f4ee" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M25 11c-3 3 3 6 0 9M33 11c-3 3 3 6 0 9" stroke-width="3"/>
+    <path d="M15 27h30v9a12 12 0 0 1-12 12h-6a12 12 0 0 1-12-12z" fill="#f7f4ee" stroke-width="3"/>
+    <path d="M45 30h3a5 5 0 0 1 0 10h-4" stroke-width="3.5"/>
+    <path d="M11 53h38" stroke-width="3.5"/>
+  </g>
+</svg>
