@@ -423,13 +423,14 @@ a {
 
 .detail {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: 400px minmax(0, 1fr);
   gap: var(--space-8);
   align-items: start;
 }
 
+/* 商品画像は 16:9 で作っているので、枠も 16:9 にして切れないようにする */
 .detail-image {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 16 / 9;
   background: var(--paper-raised);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
