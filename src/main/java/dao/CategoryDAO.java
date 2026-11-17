@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Category;
-import util.DBManager;
+import db.DBManager;
 
 /**
  * カテゴリ(CATEGORIES)へのアクセス。A-04 メニュー(商品)管理画面で使う

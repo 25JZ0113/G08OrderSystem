@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 
+import db.DBManager;
+
 /**
  * Step1・Step2・Step2b の動作確認用(main メソッドで実行する)
  * step1  接続成功・失敗の確認

@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import model.TableTerminal;
-import util.DBManager;
+import db.DBManager;
 
 /**
  * 端末設定(TERMINAL_SETTINGS)へのアクセス
