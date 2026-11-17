@@ -10,7 +10,7 @@ import java.util.List;
 import model.Order;
 import model.TableSeat;
 import model.TableTerminal;
-import util.DBManager;
+import db.DBManager;
 
 /**
  * テーブル(TABLES)へのアクセス

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.User;
-import util.DBManager;
+import db.DBManager;
 import util.PasswordUtil;
 
 /**

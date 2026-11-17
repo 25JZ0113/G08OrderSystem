@@ -13,7 +13,7 @@ import java.util.Map;
 
 import model.OrderDetail;
 import model.SalesRow;
-import util.DBManager;
+import db.DBManager;
 
 /**
  * A-05 売上管理画面の集計

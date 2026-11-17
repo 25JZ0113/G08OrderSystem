@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import model.Order;
 import model.OrderDetail;
 import model.TableTerminal;
-import util.DBManager;
+import db.DBManager;
 
 /**
  * 注文(ORDERS)へのアクセス

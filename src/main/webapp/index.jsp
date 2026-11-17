@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<%@ include file="/WEB-INF/jsp/common/head.jspf" %>
+<%@ include file="/WEB-INF/views/common/head.jspf" %>
 <title>端末の選択 | 喫茶 生成り</title>
 </head>
 <body>

@@ -15,7 +15,7 @@ import model.Order;
 import model.OrderDetail;
 import model.OrderLine;
 import model.Product;
-import util.DBManager;
+import db.DBManager;
 
 /**
  * 注文明細(ORDER_DETAILS)へのアクセス

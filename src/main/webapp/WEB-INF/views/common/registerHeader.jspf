@@ -1,0 +1,32 @@
+<%@ page pageEncoding="UTF-8" %>
+<%-- レジ端末(R-01〜R-03)共通のヘッダー
+     使う側で screenTitle(画面名)を c:set してから include する
+     headerOrder(Order)を c:set するとテーブル番号を、showGuests を true にすると人数も表示する
+     showLogout を true にすると右に【ログアウト】を出す(R-01) --%>
+<header class="app-header">
+  <p class="app-title">
+    <span class="app-shop">喫茶 生成り</span>
+    <span class="app-screen"><c:out value="${screenTitle}" /></span>
+  </p>
+  <div class="app-header-row">
+    <p class="table-info">
+      レジ端末
+      <span class="register-login">ログイン:<span class="table-info-value"><c:out value="${sessionScope.loginUser.name}" /></span></span>
+      <c:if test="${not empty headerOrder}">
+        テーブル番号:<span class="table-info-value">${headerOrder.tableNo}</span>
+        <c:if test="${showGuests}">
+          人数:<span class="table-info-value">${headerOrder.guestCount}</span>
+        </c:if>
+      </c:if>
+    </p>
+    <div class="header-actions">
+      <%-- 管理者端末から開いたときは【管理者メニュー】も出す --%>
+      <%@ include file="/WEB-INF/views/common/adminMenuButton.jspf" %>
+      <c:if test="${showLogout}">
+        <form method="post" action="${pageContext.request.contextPath}/logout">
+          <button type="submit" class="btn btn-secondary btn-sm">ログアウト</button>
+        </form>
+      </c:if>
+    </div>
+  </div>
+</header>
