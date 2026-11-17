@@ -417,6 +417,13 @@ a {
   padding: var(--space-4) var(--space-8) var(--space-8);
 }
 
+.detail-image img {
+  object-fit: contain;
+  /* 16:9 の画像は枠の高さの 12.5%〜87.5% に入る。画像の上下の端を背景にぼかしてつなぐ */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 12.5%, #000 18%, #000 82%, transparent 87.5%);
+  mask-image: linear-gradient(to bottom, transparent 12.5%, #000 18%, #000 82%, transparent 87.5%);
+}
+
 .detail-page > p {
   margin: 0 0 var(--space-4);
 }
@@ -428,10 +435,11 @@ a {
   align-items: start;
 }
 
-/* 商品画像は 16:9 で作っているので、枠も 16:9 にして切れないようにする */
+/* 商品画像は 16:9 で作っている。枠は 4:3 にし、画像は切らずに全体を収める(contain)。
+   上下の余白が目立たないように、背景を商品画像の背景(端の平均の色)と同じ生成り色にする */
 .detail-image {
-  aspect-ratio: 16 / 9;
-  background: var(--paper-raised);
+  aspect-ratio: 4 / 3;
+  background: #f6f2e8;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   overflow: hidden;
