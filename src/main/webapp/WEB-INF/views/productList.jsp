@@ -28,8 +28,9 @@
         </a>
       </c:forEach>
     </nav>
-    <%-- カートの点数(セッションのカートから) --%>
-    <p class="cart-count">カート <span class="cart-count-value">${empty sessionScope.cart ? 0 : sessionScope.cart.totalQuantity}</span>点</p>
+    <%-- カートの点数(セッションのカートから)。押すとカート画面へ --%>
+    <c:set var="cartQuantity" value="${empty sessionScope.cart ? 0 : sessionScope.cart.totalQuantity}" />
+    <a class="cart-count" href="${ctx}/cart" aria-label="カートを見る(${cartQuantity}点)">カート <span class="cart-count-value">${cartQuantity}</span>点</a>
   </aside>
 
   <%-- 右:選んだカテゴリの商品 --%>

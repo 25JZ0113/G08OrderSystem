@@ -278,14 +278,23 @@ a {
 }
 
 .cart-count {
+  display: block;
   position: sticky;
   bottom: var(--space-4);
   margin: 0;
   padding: 12px var(--space-4);
   text-align: center;
+  color: var(--ink);
+  text-decoration: none;
   background: var(--paper-raised);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
+}
+
+/* 押すとカート画面へ進めることが分かるように、マウスを乗せたら色を変える */
+.cart-count:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
 }
 
 .cart-count-value {
