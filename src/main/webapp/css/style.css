@@ -17,6 +17,7 @@
   --ink: #24221f;           /* 本文 */
   --ink-muted: #6b665e;     /* 補足 */
   --accent: #2f4a6d;        /* 藍:主要操作・リンク・選択 */
+  --accent-hover: #3d5d86;  /* 藍のボタンにマウスを乗せたとき(少し明るい藍) */
   --on-accent: #fdfcf9;     /* accent / danger の上の文字 */
   --accent-soft: #e3e8ee;   /* 選択中の背景 */
   --success: #4f6b45;       /* 完了 */
@@ -50,6 +51,7 @@
   --ink: #efe9df;
   --ink-muted: #b3aca1;
   --accent: #9db4d3;
+  --accent-hover: #b6c8e0;
   --on-accent: #1c1a17;
   --accent-soft: #343f53;
   --success: #9ab88c;
@@ -66,6 +68,7 @@
     --ink: #efe9df;
     --ink-muted: #b3aca1;
     --accent: #9db4d3;
+    --accent-hover: #b6c8e0;
     --on-accent: #1c1a17;
     --accent-soft: #343f53;
     --success: #9ab88c;
@@ -201,8 +204,8 @@ a {
 }
 
 .btn-primary:hover {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .btn-secondary {
