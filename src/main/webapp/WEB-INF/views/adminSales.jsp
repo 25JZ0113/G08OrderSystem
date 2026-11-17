@@ -67,12 +67,12 @@
 
     <div class="admin-sales-body">
       <%-- 集計表 --%>
-      <section class="admin-sales-table-wrap" aria-label="${viewName}の集計表">
+      <section class="admin-sales-table-wrap" aria-label="<c:out value='${viewName}' />の集計表">
         <div class="admin-table-scroll admin-sales-scroll">
           <table class="status-table admin-sales-table">
             <thead>
               <tr>
-                <th>${labelHead}</th>
+                <th><c:out value="${labelHead}" /></th>
                 <c:choose>
                   <c:when test="${isProduct}"><th class="amount">数量</th></c:when>
                   <c:otherwise><th class="amount">客数</th></c:otherwise>
@@ -135,7 +135,7 @@
                   <span class="vbar-area">
                     <span class="vbar" style="height: ${r.barPercent}%"></span>
                   </span>
-                  <span class="vbar-label">${st.index % step == 0 || st.last ? r.label : ''}</span>
+                  <span class="vbar-label"><c:out value="${st.index % step == 0 || st.last ? r.label : ''}" /></span>
                   <span class="vbar-tip" role="tooltip">
                     <c:out value="${r.label}" /><br>
                     <strong><fmt:formatNumber value="${r.amount}" />円</strong><br>
