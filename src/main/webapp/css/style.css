@@ -423,13 +423,15 @@ a {
 
 .detail {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: 400px minmax(0, 1fr);
   gap: var(--space-8);
   align-items: start;
 }
 
+/* 商品画像は 4:3 で作っているので、枠も 4:3 にして画像全体を表示する
+   (メニューのカードは 16:9 で、画像の上下を少し切って表示する。商品は上下の切れる範囲に入らないように作っている) */
 .detail-image {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   background: var(--paper-raised);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
