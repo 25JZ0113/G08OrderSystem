@@ -2453,6 +2453,8 @@ a {
 /* 長い期間の日別:棒を 1 本 14px より細くせず、枠の中で横にスクロールする */
 .vbar-scroll.is-long {
   overflow-x: auto;
+  overflow-y: hidden;   /* 横だけスクロールする(目盛り・吹き出しは上下の余白の中に収まる) */
+  padding-bottom: 32px; /* 目盛りの文字の高さ分(横のスクロールバーと重ならないように少し多め) */
   padding-top: 72px;   /* 吹き出しが枠で切れないように、上に余白を取る */
   margin-top: -72px;
 }
