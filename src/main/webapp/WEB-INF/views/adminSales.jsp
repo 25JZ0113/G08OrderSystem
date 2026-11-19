@@ -15,6 +15,8 @@
 <head>
 <%@ include file="common/head.jspf" %>
 <title>売上管理 | 喫茶 生成り</title>
+<%-- 期間の日付入力を、画面に合わせたカレンダーにする(JavaScript が動かないときはブラウザ標準の日付入力のまま) --%>
+<script src="${ctx}/js/calendar.js" defer></script>
 </head>
 <body>
 <header class="app-header">
@@ -36,9 +38,9 @@
     <a class="btn btn-secondary" href="${ctx}/admin/menu">管理者メニューに戻る</a>
     <input type="hidden" name="view" value="${view}">
     <label for="from">期間</label>
-    <input type="date" name="from" id="from" class="login-input" value="${from}" required>
+    <input type="date" name="from" id="from" class="login-input" value="${from}" required data-calendar>
     <span aria-hidden="true">〜</span>
-    <input type="date" name="to" id="to" class="login-input" value="${to}" required aria-label="期間の終了日">
+    <input type="date" name="to" id="to" class="login-input" value="${to}" required aria-label="期間の終了日" data-calendar>
     <button type="submit" class="btn btn-primary">集計</button>
   </form>
 
