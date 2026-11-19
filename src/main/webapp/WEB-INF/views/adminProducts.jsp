@@ -274,6 +274,12 @@
 
 <script src="${ctx}/js/imageCrop.js"></script>
 <script>
+<%-- 送信してエラーで戻ってきた画面(POST の結果)は、URL を GET の URL に置き換える。
+     そのままだと再読み込みで同じフォームがもう一度送られ、画像だけが送られずに
+     ファイル名(すでにある画像)で登録されてしまうため --%>
+<c:if test="${pageContext.request.method == 'POST'}">
+history.replaceState(null, '', '${ctx}/admin/products?categoryId=${catId}${selectedProductId > 0 ? "&productId=" : ""}${selectedProductId > 0 ? selectedProductId : ""}');
+</c:if>
 // 選んでいる商品の行が、スクロールする一覧の中で見えるようにする
 const selectedRow = document.querySelector('.admin-products-table tr.is-selected');
 if (selectedRow) {
