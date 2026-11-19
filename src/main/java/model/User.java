@@ -1,10 +1,12 @@
 package model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * ユーザー(USERS)。ログイン中のユーザーとしてセッションに入れる
  * パスワード(のハッシュ値)はセッションに持たせないので、このクラスには入れない
+ * 登録日時(DATE 型)は Timestamp で持つ
  */
 public class User implements Serializable {
 
@@ -20,6 +22,7 @@ public class User implements Serializable {
     private String name;
     private String role;
     private String status;
+    private Timestamp createdDatetime;
 
     public User() {}
 
@@ -74,5 +77,13 @@ public class User implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Timestamp getCreatedDatetime() {
+        return createdDatetime;
+    }
+
+    public void setCreatedDatetime(Timestamp createdDatetime) {
+        this.createdDatetime = createdDatetime;
     }
 }

@@ -3,10 +3,10 @@
 -- パスワードはBCrypt(jBCrypt・コスト10)でハッシュ化済み(ソルトはハッシュ値に含まれる)。テスト用の元のパスワードは admin=admin123、staff01〜03=staff123
 
 -- 1. ユーザー
-INSERT INTO USERS (ID, LOGIN_ID, PASSWORD, NAME, ROLE, STATUS) VALUES (1, 'admin', '$2a$10$9ssyeS/4gGval.HINAu/NuUFIjNJbJQyAoLkz7h0b5qASwYvZTeJi', '佐藤 花子', '管理者', '利用中');
-INSERT INTO USERS (ID, LOGIN_ID, PASSWORD, NAME, ROLE, STATUS) VALUES (2, 'staff01', '$2a$10$AxMWy00MBYTPemRlBIzYsuJNureniksG7MI0UdMFvWlyKb9ctfuh.', '鈴木 一郎', '社員', '利用中');
-INSERT INTO USERS (ID, LOGIN_ID, PASSWORD, NAME, ROLE, STATUS) VALUES (3, 'staff02', '$2a$10$ZuCrsPXvlla7nJaw/6lXtOWYZrlerC7yij7DfHIHkUVRLI9RVyorq', '高橋 美咲', '社員', '利用中');
-INSERT INTO USERS (ID, LOGIN_ID, PASSWORD, NAME, ROLE, STATUS) VALUES (4, 'staff03', '$2a$10$OgMDwcmv7SBQe0s1qZ45veH/OSBRM/lmU154CJc5q1AWWmRhCq3TG', '田中 健太', '社員', '利用停止');
+INSERT INTO USERS (ID, LOGIN_ID, PASSWORD, NAME, ROLE, STATUS, CREATED_DATETIME) VALUES (1, 'admin', '$2a$10$9ssyeS/4gGval.HINAu/NuUFIjNJbJQyAoLkz7h0b5qASwYvZTeJi', '佐藤 花子', '管理者', '利用中', TRUNC(SYSDATE) - 60 + 9/24);
+INSERT INTO USERS (ID, LOGIN_ID, PASSWORD, NAME, ROLE, STATUS, CREATED_DATETIME) VALUES (2, 'staff01', '$2a$10$AxMWy00MBYTPemRlBIzYsuJNureniksG7MI0UdMFvWlyKb9ctfuh.', '鈴木 一郎', '社員', '利用中', TRUNC(SYSDATE) - 45 + 9/24);
+INSERT INTO USERS (ID, LOGIN_ID, PASSWORD, NAME, ROLE, STATUS, CREATED_DATETIME) VALUES (3, 'staff02', '$2a$10$ZuCrsPXvlla7nJaw/6lXtOWYZrlerC7yij7DfHIHkUVRLI9RVyorq', '高橋 美咲', '社員', '利用中', TRUNC(SYSDATE) - 30 + 9/24);
+INSERT INTO USERS (ID, LOGIN_ID, PASSWORD, NAME, ROLE, STATUS, CREATED_DATETIME) VALUES (4, 'staff03', '$2a$10$OgMDwcmv7SBQe0s1qZ45veH/OSBRM/lmU154CJc5q1AWWmRhCq3TG', '田中 健太', '社員', '利用停止', TRUNC(SYSDATE) - 20 + 9/24);
 
 -- 2. カテゴリ
 INSERT INTO CATEGORIES (ID, NAME, DESCRIPTION) VALUES (1, 'コーヒー(ホット)', 'ブレンド、エスプレッソ、カフェラテ、カプチーノなど');

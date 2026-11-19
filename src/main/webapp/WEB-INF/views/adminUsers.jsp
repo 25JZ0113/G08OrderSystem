@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%-- A-03 ユーザー管理画面(管理者端末) --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <c:set var="isNew" value="${form.id == 0}" />
 <c:set var="isMe" value="${form.id == sessionScope.loginUser.id}" />
@@ -45,6 +46,7 @@
         <col>
         <col class="col-role">
         <col class="col-user-status">
+        <col class="col-created">
         <col class="col-select">
       </colgroup>
       <thead>
@@ -53,6 +55,7 @@
           <th>氏名</th>
           <th>権限</th>
           <th>利用状態</th>
+          <th>登録日</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -66,6 +69,7 @@
             </td>
             <td><c:out value="${u.role}" /></td>
             <td><span class="tag ${u.status == '利用中' ? 'tag-success' : 'tag-muted'}"><c:out value="${u.status}" /></span></td>
+            <td class="admin-users-created"><fmt:formatDate value="${u.createdDatetime}" pattern="yyyy/MM/dd" /></td>
             <td>
               <c:choose>
                 <c:when test="${u.id == form.id}">
@@ -85,6 +89,10 @@
   <%-- 右:ユーザー情報(新規登録のときは空、選択したときはそのユーザー) --%>
   <section class="admin-users-form" aria-labelledby="userFormTitle">
     <h1 class="section-title" id="userFormTitle">ユーザー情報<span class="admin-users-mode">${isNew ? '(新規登録)' : '(選択中)'}</span></h1>
+    <%-- 登録日時は登録したときに自動で入る(変更はできない) --%>
+    <c:if test="${not isNew and not empty form.createdDatetime}">
+      <p class="admin-users-note">登録日時:<fmt:formatDate value="${form.createdDatetime}" pattern="yyyy/MM/dd HH:mm" /></p>
+    </c:if>
 
     <form method="post" action="${ctx}/admin/users" id="userForm">
       <input type="hidden" name="id" value="${form.id}">

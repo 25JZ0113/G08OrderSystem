@@ -1787,7 +1787,8 @@ select.login-input:disabled {
 
 .admin-users-table .col-login       { width: 120px; }
 .admin-users-table .col-role        { width: 88px; }
-.admin-users-table .col-user-status { width: 112px; }
+.admin-users-table .col-user-status { width: 100px; }
+.admin-users-table .col-created     { width: 108px; }
 .admin-users-table .col-select      { width: 104px; }
 
 .admin-users-table td {
@@ -1799,6 +1800,12 @@ select.login-input:disabled {
   font-family: var(--font-mono);
 }
 
+.admin-users-table .admin-users-created {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
 .admin-users-table tr.is-selected td {
   background: var(--accent-soft);
 }
@@ -1807,6 +1814,7 @@ select.login-input:disabled {
   margin-left: var(--space-1);
   font-size: 13px;
   color: var(--ink-muted);
+  white-space: nowrap;   /* 「(自」「分)」のように途中で折り返さない */
 }
 
 .admin-users-form {
