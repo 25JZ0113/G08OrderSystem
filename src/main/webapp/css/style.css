@@ -2533,8 +2533,10 @@ a {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  max-height: 420px;   /* 表(.admin-sales-scroll)と同じ高さ。全商品を出すので、超えたら枠の中でスクロールする */
   margin: 0;
-  padding: 0;
+  padding: 0 var(--space-2) 0 0;
+  overflow-y: auto;
   list-style: none;
 }
 

@@ -29,8 +29,6 @@ public class AdminSalesServlet extends HttpServlet {
 
     /** 一度に集計できる期間(日数) */
     private static final int MAX_DAYS = 366;
-    /** 商品別の棒グラフに出す数(表はすべて出す) */
-    private static final int PRODUCT_CHART_MAX = 10;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -77,8 +75,6 @@ public class AdminSalesServlet extends HttpServlet {
             };
             setBarPercent(rows);
             request.setAttribute("rows", rows);
-            request.setAttribute("chartRows",
-                    "product".equals(view) && rows.size() > PRODUCT_CHART_MAX ? rows.subList(0, PRODUCT_CHART_MAX) : rows);
 
             // 合計の行(商品別は数量と金額の合計)
             long total = 0;

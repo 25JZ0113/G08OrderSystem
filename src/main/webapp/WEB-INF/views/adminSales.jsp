@@ -107,15 +107,15 @@
 
       <%-- 棒グラフ(1 系列なので凡例はなく、見出しで内容を示す。値は表と、棒に重ねたときの吹き出しで見る) --%>
       <section class="admin-sales-chart" aria-labelledby="chartTitle">
-        <h2 class="section-title" id="chartTitle">売上金額(${viewName}<c:if test="${isProduct && rows.size() > chartRows.size()}">・上位${chartRows.size()}件</c:if>)</h2>
+        <h2 class="section-title" id="chartTitle">売上金額(${viewName}<c:if test="${isProduct}">・${rows.size()}品目</c:if>)</h2>
         <c:choose>
           <c:when test="${empty rows || totalAmount == 0}">
             <p class="admin-empty admin-chart-empty">この期間の売上はありません</p>
           </c:when>
           <c:when test="${isProduct}">
-            <%-- 商品別:商品名が長いので横向きの棒 --%>
+            <%-- 商品別:商品名が長いので横向きの棒。全商品を売上金額の多い順に出し、多いときは枠の中でスクロールする --%>
             <ul class="hbar-chart">
-              <c:forEach var="r" items="${chartRows}">
+              <c:forEach var="r" items="${rows}">
                 <li class="hbar-row">
                   <span class="hbar-label"><c:out value="${r.label}" /></span>
                   <span class="hbar-track">
@@ -150,7 +150,7 @@
         </c:choose>
       </section>
     </div>
-    <p class="admin-users-note">※会計済みの注文を、会計した日で集計しています(未会計の注文は入りません)。取り消した商品は売上に入れていません(会計でも請求しません)。客単価・1来店あたり単価は円未満を切り捨てています</p>
+    <p class="admin-users-note">※会計済みの注文を、会計した日で集計しています(未会計の注文は入りません)。キャンセル(請求なし)の商品は売上に入れていません(キャンセル(請求あり)は入れています)。商品別には、期間中に売れていない商品も 0 円で表示しています。客単価・1来店あたり単価は円未満を切り捨てています</p>
   </c:if>
 </main>
 </body>
