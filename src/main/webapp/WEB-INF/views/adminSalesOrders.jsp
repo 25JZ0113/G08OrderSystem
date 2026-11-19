@@ -59,7 +59,7 @@
             <li class="sales-order">
               <%-- 注文の情報 --%>
               <div class="sales-order-head">
-                <p class="sales-order-id">注文 <span class="sales-order-num">#${o.id}</span></p>
+                <p class="sales-order-id">注文番号 <span class="sales-order-num">${o.id}</span></p>
                 <dl class="sales-order-meta">
                   <div><dt>会計</dt><dd><fmt:formatDate value="${o.paymentDatetime}" pattern="yyyy/MM/dd HH:mm" /></dd></div>
                   <div><dt>来店</dt><dd><fmt:formatDate value="${o.visitDatetime}" pattern="HH:mm" /></dd></div>
