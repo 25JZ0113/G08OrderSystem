@@ -206,7 +206,7 @@
                        value="<c:out value='${form.imageUrl}' />" placeholder="ファイル名(例:blend.jpg)" autocomplete="off">
                 <button type="button" class="btn btn-secondary admin-image-pick" id="galleryOpen">一覧から選ぶ</button>
                 <label class="btn btn-secondary admin-image-pick">
-                  画像を選ぶ
+                  画像を追加
                   <input type="file" id="imagePicker" accept="image/jpeg,image/png,image/webp" class="visually-hidden">
                 </label>
                 <span class="product-image admin-image-preview" id="imagePreview" data-base="${ctx}/images/">
@@ -219,7 +219,7 @@
               <%-- 切り取った画像(1024×768 の JPG)を入れて送る。js/imageCrop.js が入れる --%>
               <input type="file" name="imageFile" id="imageFile" class="visually-hidden" tabindex="-1" aria-hidden="true">
 
-              <%-- 画像を選ぶと出る:4:3 の枠の中がそのまま商品画像になる --%>
+              <%-- 【画像を追加】で画像を選ぶと出る:4:3 の枠の中がそのまま商品画像になる --%>
               <div class="image-crop" id="imageCrop" hidden>
                 <canvas class="image-crop-canvas" id="cropCanvas" width="640" height="480"
                         tabindex="0" aria-label="切り取る範囲(ドラッグか矢印キーで動かす)"></canvas>
@@ -230,7 +230,7 @@
                   <button type="button" class="btn btn-secondary btn-sm" id="cropCancel">この画像をやめる</button>
                 </div>
               </div>
-              <p class="admin-users-note" id="imageNote">※【一覧から選ぶ】:登録済みの画像を使う(サイズ違いなど)/【画像を選ぶ】:新しい画像を登録する(JPG・PNG・WebP、10MB まで。4:3 に切り取り、ファイル名は「.jpg」で保存)</p>
+              <p class="admin-users-note" id="imageNote">※【一覧から選ぶ】:登録済みの画像を使う(サイズ違いなど)/【画像を追加】:新しい画像を登録する(JPG・PNG・WebP、10MB まで。4:3 に切り取り、ファイル名は「.jpg」で保存)</p>
             </div>
           </div>
         </div>

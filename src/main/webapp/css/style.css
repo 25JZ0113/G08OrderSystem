@@ -2039,7 +2039,7 @@ a {
   color: var(--ink-muted);
 }
 
-/* 画像を選ぶボタン(中の input[type=file] は見えなくして、ボタンの見た目にする) */
+/* 【画像を追加】のボタン(中の input[type=file] は見えなくして、ボタンの見た目にする) */
 .admin-image-pick {
   flex: none;
   white-space: nowrap;
