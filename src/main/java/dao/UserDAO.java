@@ -28,7 +28,6 @@ public class UserDAO {
                     u.id       AS uuser_id,
                     u.login_id AS ulogin_id,
                     u.password AS upassword,
-                    u.salt     AS usalt,
                     u.name     AS uname,
                     u.role     AS urole,
                     u.status   AS ustatus
@@ -44,7 +43,7 @@ public class UserDAO {
                 if (!rs.next()) {
                     return null;
                 }
-                if (!PasswordUtil.matches(password, rs.getString("upassword"), rs.getString("usalt"))) {
+                if (!PasswordUtil.matches(password, rs.getString("upassword"))) {   // BCrypt で照合する
                     return null;
                 }
                 if (!User.STATUS_ACTIVE.equals(rs.getString("ustatus"))) {
@@ -106,23 +105,21 @@ public class UserDAO {
         }
     }
 
-    /** A-03 登録:パスワードはソルトを作ってハッシュ化して保存する。登録したユーザーの ID を返す */
+    /** A-03 登録:パスワードは BCrypt でハッシュ化して保存する(ソルトはハッシュ値に含まれる)。登録したユーザーの ID を返す */
     public int insert(User user, String password) throws SQLException {
         String sql =
                 """
-                INSERT INTO users (id, login_id, password, salt, name, role, status)
-                VALUES (seq_users.NEXTVAL, ?, ?, ?, ?, ?, ?)
+                INSERT INTO users (id, login_id, password, name, role, status)
+                VALUES (seq_users.NEXTVAL, ?, ?, ?, ?, ?)
                 """;
 
-        String salt = PasswordUtil.newSalt();
         try (Connection con = DBManager.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql, new String[] { "id" })) {
             ps.setString(1, user.getLoginId());
-            ps.setString(2, PasswordUtil.hash(password, salt));
-            ps.setString(3, salt);
-            ps.setString(4, user.getName());
-            ps.setString(5, user.getRole());
-            ps.setString(6, user.getStatus());
+            ps.setString(2, PasswordUtil.hash(password));
+            ps.setString(3, user.getName());
+            ps.setString(4, user.getRole());
+            ps.setString(5, user.getStatus());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 rs.next();
@@ -144,7 +141,7 @@ public class UserDAO {
                   """
                 : """
                   UPDATE users
-                  SET login_id = ?, name = ?, role = ?, status = ?, password = ?, salt = ?
+                  SET login_id = ?, name = ?, role = ?, status = ?, password = ?
                   WHERE id = ?
                   """;
 
@@ -157,10 +154,8 @@ public class UserDAO {
             if (password == null) {
                 ps.setInt(5, user.getId());
             } else {
-                String salt = PasswordUtil.newSalt();
-                ps.setString(5, PasswordUtil.hash(password, salt));
-                ps.setString(6, salt);
-                ps.setInt(7, user.getId());
+                ps.setString(5, PasswordUtil.hash(password));
+                ps.setInt(6, user.getId());
             }
             return ps.executeUpdate() == 1;
         }
@@ -202,7 +197,7 @@ public class UserDAO {
         }
     }
 
-    /** 一覧・選択で使う SELECT(パスワードとソルトは取らない) */
+    /** 一覧・選択で使う SELECT(パスワードのハッシュ値は取らない) */
     private static final String SELECT_USER =
             """
             SELECT

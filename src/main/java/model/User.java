@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * ユーザー(USERS)。ログイン中のユーザーとしてセッションに入れる
- * パスワードとソルトはセッションに持たせないので、このクラスには入れない
+ * パスワード(のハッシュ値)はセッションに持たせないので、このクラスには入れない
  */
 public class User implements Serializable {
 

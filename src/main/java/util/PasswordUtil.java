@@ -1,57 +1,51 @@
 package util;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
- * パスワードのハッシュ化と照合
- * USERS.PASSWORD には PBKDF2(HmacSHA256・100000 回・256bit)でハッシュ化した値を、
- * USERS.SALT にはソルトを、どちらも Base64 で保存している
+ * パスワードのハッシュ化と照合(BCrypt)
+ * 使うライブラリ:jBCrypt 0.4(src/main/webapp/WEB-INF/lib/jbcrypt-0.4.jar)
+ *
+ * USERS.PASSWORD には BCrypt のハッシュ値(60 文字。例:$2a$10$...)を保存する
+ *   $2a$ … BCrypt のバージョン  10$ … コスト(2 の 10 乗 = 1024 回)
+ *   次の 22 文字 … ソルト(毎回ランダムに作る)  残り 31 文字 … ハッシュ結果
+ * ソルトはハッシュ値の中に入っているので、別の列に保存しなくてよい
+ *
+ * 登録・変更のとき … hash() でハッシュ化して保存する
+ * ログインのとき   … matches() で、入力されたパスワードと保存されているハッシュ値を照合する
  */
 public class PasswordUtil {
 
-    private static final String ALGORITHM  = "PBKDF2WithHmacSHA256";
-    private static final int    ITERATIONS = 100000;
-    private static final int    KEY_LENGTH = 256;   // bit
-    private static final int    SALT_BYTES = 16;
+    /** コスト。1 増やすと計算量はおよそ 2 倍(ログインにかかる時間とのバランスで 10 にする) */
+    private static final int COST = 10;
+
+    /** BCrypt で扱えるパスワードの長さの上限(文字数ではなく UTF-8 のバイト数) */
+    public static final int MAX_BYTES = 72;
 
     private PasswordUtil() {}
 
-    /** 入力されたパスワードが、保存されているハッシュと一致するか */
-    public static boolean matches(String password, String hashBase64, String saltBase64) {
-        byte[] salt     = Base64.getDecoder().decode(saltBase64);
-        byte[] expected = Base64.getDecoder().decode(hashBase64);
-        byte[] actual   = hash(password, salt);
-        // 比較にかかる時間で推測されないように、MessageDigest.isEqual で比べる
-        return MessageDigest.isEqual(expected, actual);
+    /** パスワードをハッシュ化する(ソルトは自動で作られ、ハッシュ値に含まれる)。ユーザー登録・パスワード変更で使う */
+    public static String hash(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt(COST));
     }
 
-    /** 新しいソルトを作る(Base64)。ユーザー登録・パスワード変更で使う */
-    public static String newSalt() {
-        byte[] salt = new byte[SALT_BYTES];
-        new SecureRandom().nextBytes(salt);
-        return Base64.getEncoder().encodeToString(salt);
-    }
-
-    /** パスワードをハッシュ化する(Base64)。ユーザー登録・パスワード変更で使う */
-    public static String hash(String password, String saltBase64) {
-        return Base64.getEncoder().encodeToString(hash(password, Base64.getDecoder().decode(saltBase64)));
-    }
-
-    private static byte[] hash(String password, byte[] salt) {
-        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
-        try {
-            return SecretKeyFactory.getInstance(ALGORITHM).generateSecret(spec).getEncoded();
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new IllegalStateException("パスワードのハッシュ化に失敗しました", e);
-        } finally {
-            spec.clearPassword();
+    /** 入力されたパスワードが、保存されているハッシュ値と一致するか(ハッシュ値の形がおかしいときは false) */
+    public static boolean matches(String password, String hashed) {
+        if (password == null || hashed == null) {
+            return false;
         }
+        try {
+            return BCrypt.checkpw(password, hashed);
+        } catch (IllegalArgumentException e) {
+            // BCrypt の形ではない値(古い方式で保存したままの値など)
+            return false;
+        }
+    }
+
+    /** BCrypt で扱える長さ(UTF-8 で 72 バイト以内)か */
+    public static boolean isWithinMaxBytes(String password) {
+        return password.getBytes(StandardCharsets.UTF_8).length <= MAX_BYTES;
     }
 }
