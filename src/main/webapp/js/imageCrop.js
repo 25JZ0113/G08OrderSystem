@@ -210,18 +210,31 @@
     draw();
   });
 
-  /* 送信する直前に、今の枠の JPG ができているか確かめる(動かしてすぐ押したときは、作ってから送る) */
+  /*
+   * 送信する直前に、今の枠の JPG ができているか確かめる(動かしてすぐ押したときは、作ってから送る)。
+   * ボタンを続けて押しても 1 回だけ送る(2 回送ると、1 回目で登録され、2 回目が「画像はすでにあります」になる)
+   */
+  let sending = false;
   document.getElementById('productForm').addEventListener('submit', function (e) {
-    if (!img || ready) {
+    if (sending) {
+      e.preventDefault();
       return;
     }
     const submitter = e.submitter;
-    if (submitter && submitter.value === 'productDelete') {
+    const isDelete = submitter && submitter.value === 'productDelete';
+    if (img && !ready && !isDelete) {
+      e.preventDefault();
+      sending = true;
+      makeJpeg(function () {
+        sending = false;
+        e.target.requestSubmit(submitter);
+      });
       return;
     }
-    e.preventDefault();
-    makeJpeg(function () {
-      e.target.requestSubmit(submitter);
-    });
+    sending = true;
+  });
+  // ブラウザの【戻る】でこの画面に戻ったときは、また送れるようにする
+  window.addEventListener('pageshow', function () {
+    sending = false;
   });
 })();
