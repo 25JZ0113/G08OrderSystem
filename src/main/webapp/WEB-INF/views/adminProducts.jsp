@@ -126,7 +126,8 @@
     <section class="admin-product-form" aria-labelledby="productFormTitle">
       <h2 class="section-title" id="productFormTitle">商品情報<span class="admin-users-mode">${isNew ? '(新規登録)' : '(選択中)'}</span></h2>
 
-      <form method="post" action="${ctx}/admin/products" id="productForm">
+      <%-- 商品画像をアップロードできるように multipart で送る --%>
+      <form method="post" action="${ctx}/admin/products" id="productForm" enctype="multipart/form-data">
         <input type="hidden" name="categoryId" value="${catId}">
         <input type="hidden" name="productId" value="${selectedProductId}">
 
@@ -186,16 +187,37 @@
           </div>
           <div class="admin-field admin-field-wide">
             <label for="imageUrl">画像</label>
-            <span class="admin-image">
-              <input type="text" name="imageUrl" id="imageUrl" class="login-input" maxlength="100"
-                     value="<c:out value='${form.imageUrl}' />" placeholder="ファイル名(例:blend.jpg)" autocomplete="off">
-              <span class="product-image admin-image-preview">
-                <c:if test="${not empty form.imageUrl}">
-                  <img src="${ctx}/images/<c:out value='${form.imageUrl}' />" alt="" onerror="this.remove()">
-                </c:if>
-                <span class="product-image-placeholder">商品画像</span>
+            <div class="admin-image-box">
+              <span class="admin-image">
+                <input type="text" name="imageUrl" id="imageUrl" class="login-input" maxlength="100"
+                       value="<c:out value='${form.imageUrl}' />" placeholder="ファイル名(例:blend.jpg)" autocomplete="off">
+                <label class="btn btn-secondary admin-image-pick">
+                  画像を選ぶ
+                  <input type="file" id="imagePicker" accept="image/jpeg,image/png,image/webp" class="visually-hidden">
+                </label>
+                <span class="product-image admin-image-preview" id="imagePreview">
+                  <c:if test="${not empty form.imageUrl}">
+                    <img src="${ctx}/images/<c:out value='${form.imageUrl}' />" alt="" onerror="this.remove()">
+                  </c:if>
+                  <span class="product-image-placeholder">商品画像</span>
+                </span>
               </span>
-            </span>
+              <%-- 切り取った画像(1024×768 の JPG)を入れて送る。js/imageCrop.js が入れる --%>
+              <input type="file" name="imageFile" id="imageFile" class="visually-hidden" tabindex="-1" aria-hidden="true">
+
+              <%-- 画像を選ぶと出る:4:3 の枠の中がそのまま商品画像になる --%>
+              <div class="image-crop" id="imageCrop" hidden>
+                <canvas class="image-crop-canvas" id="cropCanvas" width="640" height="480"
+                        tabindex="0" aria-label="切り取る範囲(ドラッグか矢印キーで動かす)"></canvas>
+                <div class="image-crop-side">
+                  <label for="cropZoom">大きさ</label>
+                  <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1">
+                  <p class="admin-users-note">枠の中が商品画像になります。ドラッグで位置、スライダーで大きさを決めて、【${isNew ? '登録' : '変更'}】を押してください。</p>
+                  <button type="button" class="btn btn-secondary btn-sm" id="cropCancel">この画像をやめる</button>
+                </div>
+              </div>
+              <p class="admin-users-note" id="imageNote">※JPG・PNG・WebP(10MB まで)。4:3 に切り取り、ファイル名は「.jpg」で保存します</p>
+            </div>
           </div>
         </div>
 
@@ -250,6 +272,7 @@
   </div>
 </main>
 
+<script src="${ctx}/js/imageCrop.js"></script>
 <script>
 // 選んでいる商品の行が、スクロールする一覧の中で見えるようにする
 const selectedRow = document.querySelector('.admin-products-table tr.is-selected');

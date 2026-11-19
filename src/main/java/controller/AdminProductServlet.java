@@ -1,21 +1,26 @@
 package controller;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 // Tomcat11 なので jakarta.* を使う
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 import dao.CategoryDAO;
 import dao.ProductDAO;
 import model.Category;
 import model.Product;
+import util.ImageStore;
 
 /**
  * A-04 メニュー(商品)管理画面(Controller)
@@ -27,8 +32,10 @@ import model.Product;
  *   POST action=categoryAdd / categoryUpdate / categoryDelete
  *              productRegister / productUpdate / productDelete / toppingAdd / toppingRemove
  * 価格を変えても、注文明細に保存した販売価格には影響しない
+ * 商品画像は【登録】【変更】のときにアップロードできる(ブラウザで 4:3・1024×768 の JPG にしたもの。util.ImageStore)
  */
 @WebServlet("/admin/products")
+@MultipartConfig(maxFileSize = ImageStore.MAX_BYTES, maxRequestSize = ImageStore.MAX_BYTES + 1024 * 1024)
 public class AdminProductServlet extends HttpServlet {
 
     private static final int CATEGORY_NAME_MAX = 20;
@@ -172,25 +179,84 @@ public class AdminProductServlet extends HttpServlet {
 
         boolean isNew = "productRegister".equals(action);
         Product form = readProduct(request, isNew ? 0 : productId);
+        byte[] image = readImage(request);
+        if (image != null && form.getImageUrl() != null) {
+            form.setImageUrl(ImageStore.toJpgName(form.getImageUrl()));   // ブラウザで JPG にしてあるので拡張子をそろえる
+        }
         String error = validateProduct(request, form);
+        if (error == null && image != null) {
+            error = validateImage(request, form, image);
+        }
         if (error == null && dao.existsSame(form.getCategoryId(), form.getName(), form.getSizeName(), form.getId())) {
             error = "同じカテゴリに、同じ商品名・サイズの商品がすでにあります。";
         }
         if (error != null) {
+            if (image != null) {
+                error += "(画像はもう一度選んでください)";
+            }
             request.setAttribute("errorMessage", error);
             show(request, response, categoryId, isNew ? 0 : productId, form, null);
             return;
         }
 
-        if (isNew) {
-            int newId = dao.insert(form);
-            redirect(request, response, form.getCategoryId(), newId, "productRegistered");
-        } else if (dao.update(form)) {
-            // カテゴリを変えたときは、移した先のカテゴリを開く
-            redirect(request, response, form.getCategoryId(), productId, "productUpdated");
-        } else {
-            redirect(request, response, categoryId, 0, "gone");
+        // 画像を保存してから DB に登録する。DB に登録できなかったら、保存した画像を消す
+        List<Path> saved = List.of();
+        if (image != null) {
+            try {
+                saved = ImageStore.save(getServletContext(), form.getImageUrl(), image);
+            } catch (IOException e) {
+                e.printStackTrace();
+                request.setAttribute("errorMessage", "画像を保存できませんでした。もう一度お試しください。(画像はもう一度選んでください)");
+                show(request, response, categoryId, isNew ? 0 : productId, form, null);
+                return;
+            }
         }
+        String done = isNew ? "productRegistered" : "productUpdated";
+        if (image != null && !ImageStore.savesToProject(getServletContext())) {
+            done += "NoProject";
+        }
+        try {
+            if (isNew) {
+                int newId = dao.insert(form);
+                redirect(request, response, form.getCategoryId(), newId, done);
+            } else if (dao.update(form)) {
+                // カテゴリを変えたときは、移した先のカテゴリを開く
+                redirect(request, response, form.getCategoryId(), productId, done);
+            } else {
+                ImageStore.delete(saved);
+                redirect(request, response, categoryId, 0, "gone");
+            }
+        } catch (SQLException e) {
+            ImageStore.delete(saved);
+            throw e;
+        }
+    }
+
+    /** アップロードされた画像(選ばれていなければ null) */
+    private byte[] readImage(HttpServletRequest request) throws IOException, ServletException {
+        if (request.getContentType() == null || !request.getContentType().startsWith("multipart/")) {
+            return null;
+        }
+        Part part = request.getPart("imageFile");
+        if (part == null || part.getSize() == 0) {
+            return null;
+        }
+        try (InputStream in = part.getInputStream()) {
+            return in.readAllBytes();
+        }
+    }
+
+    private String validateImage(HttpServletRequest request, Product p, byte[] image) {
+        if (p.getImageUrl() == null) {
+            return "画像のファイル名を入力してください(例:cafe-au-lait.jpg)。";
+        }
+        if (!ImageStore.isJpeg(image)) {
+            return "画像を読み込めませんでした。JPG・PNG・WebP の画像を選んでください。";
+        }
+        if (ImageStore.exists(getServletContext(), p.getImageUrl())) {
+            return "画像「" + p.getImageUrl() + "」はすでにあります。別のファイル名を入力してください。";
+        }
+        return null;
     }
 
     /** 入力欄の値を Product に詰める(数字でない値は -1 にして、入力チェックでエラーにする) */
@@ -333,6 +399,9 @@ public class AdminProductServlet extends HttpServlet {
             case "categoryDeleted"   -> request.setAttribute("successMessage", "カテゴリを削除しました。");
             case "productRegistered" -> request.setAttribute("successMessage", "商品を登録しました。");
             case "productUpdated"    -> request.setAttribute("successMessage", "商品を変更しました。");
+            case "productRegisteredNoProject", "productUpdatedNoProject" -> request.setAttribute("successMessage",
+                    (result.startsWith("productRegistered") ? "商品を登録しました。" : "商品を変更しました。")
+                    + "※画像はプロジェクトの images に保存していません(WEB-INF/upload.properties がないため)。Eclipse で「クリーン」すると消えます。");
             case "productDeleted"    -> request.setAttribute("successMessage", "商品を削除しました。");
             case "toppingAdded"      -> request.setAttribute("successMessage", "トッピングを追加しました。");
             case "toppingRemoved"    -> request.setAttribute("successMessage", "トッピングを外しました。");

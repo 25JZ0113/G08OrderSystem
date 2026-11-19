@@ -1,0 +1,8 @@
+# メニュー管理画面でアップロードした商品画像の保存先(PC ごとに違うので Git に上げない)
+# このファイルをコピーして upload.properties という名前にし、下の行を自分の PC のパスに書き換える。
+#
+# プロジェクトの src/main/webapp/images の場所を書く(\ のままで大丈夫)。
+# ここに保存しておくと、Eclipse で「クリーン」しても画像が消えず、Git でコミットもできる。
+# upload.properties がない・空欄のときは、Tomcat の配備先の images だけに保存する
+# (「クリーン」すると消える)。
+project.images.dir=C:\Users\(ユーザー名)\eclipse-workspace\G08OrderSystem\src\main\webapp\images
