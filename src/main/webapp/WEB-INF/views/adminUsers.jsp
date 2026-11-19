@@ -155,6 +155,12 @@
 </main>
 
 <script>
+<%-- 送信してエラーで戻ってきた画面(POST の結果)は、URL を GET の URL に置き換える。
+     そのままだと再読み込みで同じフォームがもう一度送られるため --%>
+<c:if test="${pageContext.request.method == 'POST'}">
+history.replaceState(null, '', '${pageContext.request.contextPath}/admin/users${form.id > 0 ? "?id=" : ""}${form.id > 0 ? form.id : ""}');
+</c:if>
+
 // 【削除】は確認してから送信する
 document.getElementById('deleteButton').addEventListener('click', function (e) {
   if (!confirm(this.dataset.confirm)) {
