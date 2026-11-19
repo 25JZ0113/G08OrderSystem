@@ -127,9 +127,12 @@
             </ul>
           </c:when>
           <c:otherwise>
-            <%-- 日別・曜日別・月別:縦向きの棒。日が多いときは目盛りの文字を間引く --%>
+            <%-- 日別・曜日別・月別:縦向きの棒。日が多いときは目盛りの文字を間引く
+                 31 本を超える(長い期間の日別)ときは棒を細くしすぎず、枠の中で横にスクロールする --%>
             <c:set var="n" value="${rows.size()}" />
-            <c:set var="step" value="${n <= 12 ? 1 : (n <= 31 ? 5 : 10)}" />
+            <c:set var="isLong" value="${n > 31}" />
+            <c:set var="step" value="${n <= 12 ? 1 : (n <= 31 ? 5 : 7)}" />
+            <div class="vbar-scroll ${isLong ? 'is-long' : ''}">
             <div class="vbar-chart" style="--bar-count: ${n}">
               <c:forEach var="r" items="${rows}" varStatus="st">
                 <div class="vbar-col" tabindex="0"
@@ -137,7 +140,8 @@
                   <span class="vbar-area">
                     <span class="vbar" style="height: ${r.barPercent}%"></span>
                   </span>
-                  <span class="vbar-label"><c:out value="${st.index % step == 0 || st.last ? r.label : ''}" /></span>
+                  <%-- 最後の日も出す。ただし直前の目盛りと近すぎて重なるときは出さない --%>
+                  <span class="vbar-label"><c:out value="${st.index % step == 0 || (st.last && (step == 1 || (n - 1) % step >= 3)) ? r.label : ''}" /></span>
                   <span class="vbar-tip" role="tooltip">
                     <c:out value="${r.label}" /><br>
                     <strong><fmt:formatNumber value="${r.amount}" />円</strong><br>
@@ -146,6 +150,16 @@
                 </div>
               </c:forEach>
             </div>
+            </div>
+            <c:if test="${isLong}">
+              <p class="vbar-scroll-note">※期間が長いので、グラフは横にスクロールして見られます(最初は最後の日の付近を表示します)</p>
+              <script>
+                // 横にスクロールするグラフは、最初に最新(右端)を見せる
+                document.querySelectorAll('.vbar-scroll.is-long').forEach(function (el) {
+                  el.scrollLeft = el.scrollWidth;
+                });
+              </script>
+            </c:if>
           </c:otherwise>
         </c:choose>
       </section>
