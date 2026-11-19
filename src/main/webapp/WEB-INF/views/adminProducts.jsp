@@ -124,12 +124,25 @@
 
     <%-- 右下:商品情報 --%>
     <section class="admin-product-form" aria-labelledby="productFormTitle">
-      <h2 class="section-title" id="productFormTitle">商品情報<span class="admin-users-mode">${isNew ? '(新規登録)' : '(選択中)'}</span></h2>
+      <div class="admin-product-form-head">
+        <h2 class="section-title" id="productFormTitle">商品情報<span class="admin-users-mode"><c:choose>
+          <c:when test="${not empty copySource}">(新規登録:「<c:out value="${copySource.name}" /><c:if test="${not empty copySource.sizeName}">(<c:out value="${copySource.sizeName}" />)</c:if>」をもとに)</c:when>
+          <c:when test="${isNew}">(新規登録)</c:when>
+          <c:otherwise>(選択中)</c:otherwise>
+        </c:choose></span></h2>
+        <%-- サイズ違いなど、選んでいる商品と同じ内容(画像・トッピングも)で新しく登録するとき --%>
+        <c:if test="${not isNew}">
+          <a class="btn btn-secondary btn-sm" href="${ctx}/admin/products?categoryId=${catId}&copyFrom=${selectedProductId}">この商品をもとに追加</a>
+        </c:if>
+      </div>
 
       <%-- 商品画像をアップロードできるように multipart で送る --%>
       <form method="post" action="${ctx}/admin/products" id="productForm" enctype="multipart/form-data">
         <input type="hidden" name="categoryId" value="${catId}">
         <input type="hidden" name="productId" value="${selectedProductId}">
+        <c:if test="${not empty copySource}">
+          <input type="hidden" name="copyFrom" value="${copySource.id}">
+        </c:if>
 
         <div class="admin-product-fields">
           <div class="admin-field">
@@ -191,11 +204,12 @@
               <span class="admin-image">
                 <input type="text" name="imageUrl" id="imageUrl" class="login-input" maxlength="100"
                        value="<c:out value='${form.imageUrl}' />" placeholder="ファイル名(例:blend.jpg)" autocomplete="off">
+                <button type="button" class="btn btn-secondary admin-image-pick" id="galleryOpen">一覧から選ぶ</button>
                 <label class="btn btn-secondary admin-image-pick">
                   画像を選ぶ
                   <input type="file" id="imagePicker" accept="image/jpeg,image/png,image/webp" class="visually-hidden">
                 </label>
-                <span class="product-image admin-image-preview" id="imagePreview">
+                <span class="product-image admin-image-preview" id="imagePreview" data-base="${ctx}/images/">
                   <c:if test="${not empty form.imageUrl}">
                     <img src="${ctx}/images/<c:out value='${form.imageUrl}' />" alt="" onerror="this.remove()">
                   </c:if>
@@ -216,7 +230,7 @@
                   <button type="button" class="btn btn-secondary btn-sm" id="cropCancel">この画像をやめる</button>
                 </div>
               </div>
-              <p class="admin-users-note" id="imageNote">※JPG・PNG・WebP(10MB まで)。4:3 に切り取り、ファイル名は「.jpg」で保存します</p>
+              <p class="admin-users-note" id="imageNote">※【一覧から選ぶ】:登録済みの画像を使う(サイズ違いなど)/【画像を選ぶ】:新しい画像を登録する(JPG・PNG・WebP、10MB まで。4:3 に切り取り、ファイル名は「.jpg」で保存)</p>
             </div>
           </div>
         </div>
@@ -230,6 +244,9 @@
                   ${isNew ? 'disabled' : ''}
                   data-confirm="<c:out value='「${productLabel}」を削除します。元に戻せません。よろしいですか?' />">削除</button>
         </div>
+        <c:if test="${not empty copySource}">
+          <p class="admin-users-note">※登録すると、もとにした商品と同じトッピングも付けます</p>
+        </c:if>
         <p class="admin-users-note">※価格を変えても、すでに注文された明細の金額は変わりません。注文されたことがある商品は削除できないので「販売停止」にしてください</p>
       </form>
 
@@ -272,13 +289,32 @@
   </div>
 </main>
 
+<%-- 【一覧から選ぶ】:images にある画像から選ぶ --%>
+<dialog id="imageGallery" class="confirm-dialog image-gallery-dialog" aria-labelledby="galleryTitle">
+  <h2 class="confirm-title" id="galleryTitle">登録済みの画像から選ぶ</h2>
+  <div class="image-gallery">
+    <c:forEach var="f" items="${imageFiles}">
+      <button type="button" class="image-gallery-item" data-name="<c:out value='${f}' />">
+        <span class="image-gallery-thumb"><img src="${ctx}/images/<c:out value='${f}' />" alt="" loading="lazy"></span>
+        <span class="image-gallery-name"><c:out value="${f}" /></span>
+      </button>
+    </c:forEach>
+    <c:if test="${empty imageFiles}">
+      <p class="admin-empty">画像がありません</p>
+    </c:if>
+  </div>
+  <div class="confirm-actions">
+    <button type="button" class="btn btn-secondary" id="galleryClose">閉じる</button>
+  </div>
+</dialog>
+
 <script src="${ctx}/js/imageCrop.js"></script>
 <script>
 <%-- 送信してエラーで戻ってきた画面(POST の結果)は、URL を GET の URL に置き換える。
      そのままだと再読み込みで同じフォームがもう一度送られ、画像だけが送られずに
      ファイル名(すでにある画像)で登録されてしまうため --%>
 <c:if test="${pageContext.request.method == 'POST'}">
-history.replaceState(null, '', '${ctx}/admin/products?categoryId=${catId}${selectedProductId > 0 ? "&productId=" : ""}${selectedProductId > 0 ? selectedProductId : ""}');
+history.replaceState(null, '', '${ctx}/admin/products?categoryId=${catId}${selectedProductId > 0 ? "&productId=" : ""}${selectedProductId > 0 ? selectedProductId : ""}${not empty copySource ? "&copyFrom=" : ""}${not empty copySource ? copySource.id : ""}');
 </c:if>
 // 選んでいる商品の行が、スクロールする一覧の中で見えるようにする
 const selectedRow = document.querySelector('.admin-products-table tr.is-selected');

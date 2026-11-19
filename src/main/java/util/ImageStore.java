@@ -83,6 +83,24 @@ public class ImageStore {
         return saved;
     }
 
+    /** 配備先の images にある画像のファイル名(名前順)。メニュー管理画面の「一覧から選ぶ」で使う */
+    public static List<String> list(ServletContext ctx) {
+        List<String> names = new ArrayList<>();
+        String real = ctx.getRealPath("/images");
+        if (real == null) {
+            return names;
+        }
+        try (var files = Files.list(Path.of(real))) {
+            files.map(f -> f.getFileName().toString())
+                    .filter(n -> n.matches("(?i)[A-Za-z0-9._-]+\\.(jpe?g|png|webp|gif)"))
+                    .sorted()
+                    .forEach(names::add);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return names;
+    }
+
     /** 保存した画像を消す */
     public static void delete(List<Path> files) {
         for (Path f : files) {

@@ -29,6 +29,7 @@ import util.ImageStore;
  * 右下:商品情報の入力欄と【登録】【変更】【削除】、付けられるトッピングの【追加】【外す】
  *   GET  /admin/products?categoryId=C            … カテゴリ C の商品一覧(商品情報は新規登録)
  *   GET  /admin/products?categoryId=C&productId=P … 商品 P を選んだ状態
+ *   GET  /admin/products?categoryId=C&copyFrom=P  … 商品 P の内容を入れた新規登録(この商品をもとに追加)
  *   POST action=categoryAdd / categoryUpdate / categoryDelete
  *              productRegister / productUpdate / productDelete / toppingAdd / toppingRemove
  * 価格を変えても、注文明細に保存した販売価格には影響しない
@@ -48,8 +49,27 @@ public class AdminProductServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         setResultMessage(request);
-        show(request, response, parseInt(request.getParameter("categoryId")),
-                parseInt(request.getParameter("productId")), null, null);
+        int categoryId = parseInt(request.getParameter("categoryId"));
+
+        // 「この商品をもとに追加」:選んでいた商品の内容(画像を含む)を入れた新規登録の画面
+        int copyFrom = parseInt(request.getParameter("copyFrom"));
+        if (copyFrom > 0) {
+            try {
+                Product source = new ProductDAO().findById(copyFrom);
+                if (source != null) {
+                    request.setAttribute("copySource", source);
+                    Product form = new ProductDAO().findById(copyFrom);
+                    form.setId(0);
+                    show(request, response, categoryId, 0, form, null);
+                    return;
+                }
+                request.setAttribute("errorMessage", "もとにする商品はほかの端末で削除されています。");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                request.setAttribute("errorMessage", "メニューを読み込めませんでした。");
+            }
+        }
+        show(request, response, categoryId, parseInt(request.getParameter("productId")), null, null);
     }
 
     @Override
@@ -190,9 +210,13 @@ public class AdminProductServlet extends HttpServlet {
         if (error == null && dao.existsSame(form.getCategoryId(), form.getName(), form.getSizeName(), form.getId())) {
             error = "同じカテゴリに、同じ商品名・サイズの商品がすでにあります。";
         }
+        int copyFrom = isNew ? parseInt(request.getParameter("copyFrom")) : 0;
         if (error != null) {
             if (image != null) {
                 error += "(画像はもう一度選んでください)";
+            }
+            if (copyFrom > 0) {
+                request.setAttribute("copySource", dao.findById(copyFrom));
             }
             request.setAttribute("errorMessage", error);
             show(request, response, categoryId, isNew ? 0 : productId, form, null);
@@ -218,6 +242,9 @@ public class AdminProductServlet extends HttpServlet {
         try {
             if (isNew) {
                 int newId = dao.insert(form);
+                if (copyFrom > 0) {
+                    dao.copyToppings(copyFrom, newId);   // もとにした商品と同じトッピングを付ける
+                }
                 redirect(request, response, form.getCategoryId(), newId, done);
             } else if (dao.update(form)) {
                 // カテゴリを変えたときは、移した先のカテゴリを開く
@@ -375,6 +402,7 @@ public class AdminProductServlet extends HttpServlet {
             }
             request.setAttribute("form", form);
             request.setAttribute("selectedProductId", product == null ? 0 : product.getId());
+            request.setAttribute("imageFiles", ImageStore.list(getServletContext()));
 
             // 選んだ商品に付けられるトッピング(トッピング自身には付けない)
             if (product != null && !ProductDAO.TOPPING_CATEGORY.equals(product.getCategoryName())) {

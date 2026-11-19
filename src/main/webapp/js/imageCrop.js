@@ -3,6 +3,7 @@
  * 選んだ画像(JPG・PNG・WebP、10MB まで)を枠の中に表示し、ドラッグで位置・スライダーで大きさを決める。
  * 枠の中を 1024×768 の JPG にして、送信用の <input type="file" name="imageFile"> に入れる
  * (変換はブラウザがするので、サーバーは JPG だけを受け取ればよい)。
+ * 【一覧から選ぶ】では、images にある登録済みの画像を選んでファイル名の欄に入れる(サイズ違いなどで同じ画像を使うとき)。
  */
 (function () {
   'use strict';
@@ -98,9 +99,19 @@
     }, 'image/jpeg', 0.85);
   }
 
-  /* ファイル名の欄:拡張子を .jpg にする。空なら元のファイル名(半角英数字にできれば)を入れる */
+  /*
+   * ファイル名の欄:拡張子を .jpg にする。空なら元のファイル名(半角英数字にできれば)を入れる。
+   * 登録済みの画像の名前(一覧から選んだ・もとにした商品の画像)が入っているときも、元のファイル名に入れ替える
+   */
+  const savedNames = new Set(Array.from(document.querySelectorAll('.image-gallery-item'), function (b) {
+    return b.dataset.name;
+  }));
   function fillName(file) {
-    const v = nameBox.value.trim();
+    let v = nameBox.value.trim();
+    if (savedNames.has(v)) {
+      v = '';
+      nameBox.value = '';
+    }
     if (v) {
       nameBox.value = v.replace(/\.(jpe?g|png|webp)$/i, '') + '.jpg';
       return;
@@ -170,6 +181,74 @@
   });
 
   cancel.addEventListener('click', reset);
+
+  /* 右のプレビューを、images にある画像(ファイル名)で表示する */
+  function showSaved(name) {
+    preview.innerHTML = '<span class="product-image-placeholder">商品画像</span>';
+    if (!name) {
+      return;
+    }
+    const p = document.createElement('img');
+    p.alt = '';
+    p.onerror = function () { p.remove(); };
+    p.src = preview.dataset.base + encodeURIComponent(name);
+    preview.prepend(p);
+  }
+
+  /* ファイル名を手で入力したら、その画像をプレビューに出す(新しい画像を選んでいるときは除く) */
+  let typing = 0;
+  nameBox.addEventListener('input', function () {
+    if (img) {
+      return;
+    }
+    clearTimeout(typing);
+    typing = setTimeout(function () {
+      showSaved(nameBox.value.trim());
+    }, 300);
+  });
+
+  /* 【一覧から選ぶ】:images にある画像を選ぶと、ファイル名の欄に入れる */
+  const gallery = document.getElementById('imageGallery');
+  const galleryOpen = document.getElementById('galleryOpen');
+  if (gallery && galleryOpen) {
+    galleryOpen.addEventListener('click', function () {
+      const current = nameBox.value.trim();
+      let selected = null;
+      gallery.querySelectorAll('.image-gallery-item').forEach(function (b) {
+        const on = b.dataset.name === current;
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (on) {
+          selected = b;
+        }
+      });
+      gallery.showModal();
+      if (selected) {
+        selected.scrollIntoView({ block: 'center' });
+        selected.focus();
+      }
+    });
+    gallery.querySelectorAll('.image-gallery-item').forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (img) {
+          reset();   // 新しい画像を選んでいたら、やめて登録済みの画像を使う
+        }
+        nameBox.value = b.dataset.name;
+        showSaved(b.dataset.name);
+        gallery.close();
+        nameBox.focus();
+      });
+    });
+    document.getElementById('galleryClose').addEventListener('click', function () {
+      gallery.close();
+    });
+    // 枠の外(暗いところ)を押しても閉じる
+    gallery.addEventListener('click', function (e) {
+      const r = gallery.getBoundingClientRect();
+      if (e.target === gallery && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) {
+        gallery.close();
+      }
+    });
+  }
 
   /* ドラッグで位置を動かす(画像を指でつかんで動かす向き) */
   let dragging = null;
