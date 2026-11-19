@@ -107,15 +107,15 @@
 
       <%-- 棒グラフ(1 系列なので凡例はなく、見出しで内容を示す。値は表と、棒に重ねたときの吹き出しで見る) --%>
       <section class="admin-sales-chart" aria-labelledby="chartTitle">
-        <h2 class="section-title" id="chartTitle">売上金額(${viewName}<c:if test="${isProduct && rows.size() > chartRows.size()}">・上位${chartRows.size()}件</c:if>)</h2>
+        <h2 class="section-title" id="chartTitle">売上金額(${viewName}<c:if test="${isProduct}">・${rows.size()}品目</c:if>)</h2>
         <c:choose>
           <c:when test="${empty rows || totalAmount == 0}">
             <p class="admin-empty admin-chart-empty">この期間の売上はありません</p>
           </c:when>
           <c:when test="${isProduct}">
-            <%-- 商品別:商品名が長いので横向きの棒 --%>
+            <%-- 商品別:商品名が長いので横向きの棒。全商品を売上金額の多い順に出し、多いときは枠の中でスクロールする --%>
             <ul class="hbar-chart">
-              <c:forEach var="r" items="${chartRows}">
+              <c:forEach var="r" items="${rows}">
                 <li class="hbar-row">
                   <span class="hbar-label"><c:out value="${r.label}" /></span>
                   <span class="hbar-track">
