@@ -30,7 +30,8 @@ public class UserDAO {
                     u.password AS upassword,
                     u.name     AS uname,
                     u.role     AS urole,
-                    u.status   AS ustatus
+                    u.status   AS ustatus,
+                    u.created_datetime AS ucreated_datetime
                 FROM
                     users u
                 WHERE u.login_id = ?
@@ -105,12 +106,15 @@ public class UserDAO {
         }
     }
 
-    /** A-03 登録:パスワードは BCrypt でハッシュ化して保存する(ソルトはハッシュ値に含まれる)。登録したユーザーの ID を返す */
+    /**
+     * A-03 登録:パスワードは BCrypt でハッシュ化して保存する(ソルトはハッシュ値に含まれる)。
+     * 登録日時は DB の現在日時(SYSDATE)。登録したユーザーの ID を返す
+     */
     public int insert(User user, String password) throws SQLException {
         String sql =
                 """
-                INSERT INTO users (id, login_id, password, name, role, status)
-                VALUES (seq_users.NEXTVAL, ?, ?, ?, ?, ?)
+                INSERT INTO users (id, login_id, password, name, role, status, created_datetime)
+                VALUES (seq_users.NEXTVAL, ?, ?, ?, ?, ?, SYSDATE)
                 """;
 
         try (Connection con = DBManager.getConnection();
@@ -129,7 +133,7 @@ public class UserDAO {
     }
 
     /**
-     * A-03 変更:password が null のときはパスワードを変えない
+     * A-03 変更:password が null のときはパスワードを変えない(登録日時は変えない)
      * 変更できたら true(ほかの端末で削除されていたら false)
      */
     public boolean update(User user, String password) throws SQLException {
@@ -205,17 +209,20 @@ public class UserDAO {
                 u.login_id AS ulogin_id,
                 u.name     AS uname,
                 u.role     AS urole,
-                u.status   AS ustatus
+                u.status   AS ustatus,
+                u.created_datetime AS ucreated_datetime
             FROM
                 users u
             """;
 
     private User toUser(ResultSet rs) throws SQLException {
-        return new User(
+        User u = new User(
                 rs.getInt("uuser_id"),
                 rs.getString("ulogin_id"),
                 rs.getString("uname"),
                 rs.getString("urole"),
                 rs.getString("ustatus"));
+        u.setCreatedDatetime(rs.getTimestamp("ucreated_datetime"));   // DATE 型は Timestamp で取る
+        return u;
     }
 }

@@ -1785,18 +1785,46 @@ select.login-input:disabled {
   margin-bottom: var(--space-4);
 }
 
-.admin-users-table .col-login       { width: 120px; }
-.admin-users-table .col-role        { width: 88px; }
-.admin-users-table .col-user-status { width: 112px; }
-.admin-users-table .col-select      { width: 104px; }
+/*
+ * 列の幅は中身に合わせる(幅を固定すると、画面を拡大したり狭くしたりしたときに、
+ * 残りの氏名の列が 1 文字分まで縮んでしまうため)。
+ * 氏名以外は折り返さず、氏名は 6 文字分の幅を確保して、それより狭ければ折り返す
+ */
+.admin-users-table {
+  table-layout: auto;
+}
+
+.admin-users-table th,
+.admin-users-table td {
+  padding-left: 12px;
+  padding-right: 12px;
+  white-space: nowrap;
+}
 
 .admin-users-table td {
   vertical-align: middle;
+}
+
+.admin-users-table .admin-users-name {
+  width: 100%;
+  min-width: 6em;
+  white-space: normal;
   overflow-wrap: anywhere;
+}
+
+.admin-users-table .col-select .btn,
+.admin-users-table td:last-child .btn {
+  min-width: 72px;
 }
 
 .admin-users-login {
   font-family: var(--font-mono);
+}
+
+.admin-users-table .admin-users-created {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .admin-users-table tr.is-selected td {
@@ -1807,6 +1835,7 @@ select.login-input:disabled {
   margin-left: var(--space-1);
   font-size: 13px;
   color: var(--ink-muted);
+  white-space: nowrap;   /* 「(自」「分)」のように途中で折り返さない */
 }
 
 .admin-users-form {
