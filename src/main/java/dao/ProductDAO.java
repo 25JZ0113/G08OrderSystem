@@ -435,6 +435,24 @@ public class ProductDAO {
         }
     }
 
+    /** 商品 fromId に付けられるトッピングを、商品 toId にも付ける(「この商品をもとに追加」で使う) */
+    public void copyToppings(int fromId, int toId) throws SQLException {
+        String sql =
+                """
+                INSERT INTO product_toppings (id, product_id, topping_product_id)
+                SELECT seq_product_toppings.NEXTVAL, ?, pt.topping_product_id
+                FROM product_toppings pt
+                WHERE pt.product_id = ?
+                """;
+
+        try (Connection con = DBManager.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, toId);
+            ps.setInt(2, fromId);
+            ps.executeUpdate();
+        }
+    }
+
     /** トッピングを外す。外せたら true */
     public boolean removeTopping(int productId, int toppingProductId) throws SQLException {
         String sql =

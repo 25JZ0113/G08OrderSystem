@@ -7,3 +7,6 @@ bin/
 src/main/java/db/DBManager.java
 # 以前の置き場所(util)に残っている DBManager.java も上げない
 src/main/java/util/DBManager.java
+
+# 商品画像の保存先(PC ごとに違う)。upload.properties.example をコピーして作る
+src/main/webapp/WEB-INF/upload.properties

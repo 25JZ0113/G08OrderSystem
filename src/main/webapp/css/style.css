@@ -1964,6 +1964,156 @@ a {
   overflow: hidden;
 }
 
+/* 商品情報の見出しと【この商品をもとに追加】 */
+.admin-product-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+/* 【一覧から選ぶ】のダイアログ:登録済みの画像をサムネイルで並べる */
+.image-gallery-dialog {
+  width: min(880px, calc(100% - 32px));
+}
+
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-4);
+  max-height: min(60vh, 560px);
+  overflow-y: auto;
+  margin-bottom: var(--space-4);
+  padding: var(--space-1);
+}
+
+.image-gallery-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.image-gallery-item:hover {
+  border-color: var(--accent);
+}
+
+.image-gallery-item:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.image-gallery-item[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+  background: var(--accent-soft);
+}
+
+.image-gallery-thumb {
+  display: block;
+  aspect-ratio: 4 / 3;
+  background: var(--paper);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.image-gallery-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-gallery-name {
+  font-size: 12px;
+  line-height: 16px;
+  word-break: break-all;
+  color: var(--ink-muted);
+}
+
+/* 【画像を追加】のボタン(中の input[type=file] は見えなくして、ボタンの見た目にする) */
+.admin-image-pick {
+  flex: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.admin-image-pick:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 画像の切り取り:左に 4:3 の枠、右に大きさのスライダーと説明 */
+.image-crop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper-raised);
+}
+
+.image-crop[hidden] {
+  display: none;
+}
+
+.image-crop-canvas {
+  display: block;
+  width: 320px;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  touch-action: none;
+}
+
+.image-crop-canvas:active {
+  cursor: grabbing;
+}
+
+.image-crop-canvas:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.image-crop-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 200px;
+}
+
+.image-crop-side input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
 .admin-product-buttons {
   max-width: 480px;
 }
