@@ -14,6 +14,7 @@ public class SalesRow implements Serializable {
     private int  quantity;          // 数量(商品別)
     private long amount;            // 売上金額
     private int  barPercent;        // 棒グラフの長さ(いちばん大きい行を 100 とする)
+    private String key;             // 注文の詳細を見るときの値(日:2026-11-03・曜日:0〜6(月〜日)・月:2026-11・商品:商品 ID)
 
     public SalesRow(String label) {
         this.label = label;
@@ -52,6 +53,14 @@ public class SalesRow implements Serializable {
 
     public long getAmount() {
         return amount;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public int getBarPercent() {

@@ -2737,3 +2737,183 @@ a {
     padding: var(--space-4);
   }
 }
+
+/* ============================================================
+   A-05 売上管理:表の行・グラフの棒を押すと注文一覧(A-06)を開く
+   ============================================================ */
+.admin-sales-table tr.is-link {
+  cursor: pointer;
+}
+
+.admin-sales-table tr.is-link:hover td {
+  background: var(--accent-soft);
+}
+
+.sales-row-link {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sales-row-link:hover {
+  text-decoration: underline;
+}
+
+a.vbar-col,
+a.hbar-row {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.hbar-row {
+  border-radius: var(--radius-sm);
+}
+
+a.hbar-row:hover,
+a.hbar-row:focus-visible {
+  background: var(--accent-soft);
+}
+
+a.hbar-row:hover .hbar,
+a.hbar-row:focus-visible .hbar {
+  filter: brightness(1.25);
+}
+
+a.hbar-row:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.vbar-tip-hint {
+  font-size: 11px;
+  color: var(--accent);
+}
+
+/* ============================================================
+   A-06 売上の注文一覧
+   ============================================================ */
+.sales-orders-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.sales-orders-title {
+  margin: 0;
+}
+
+.sales-orders-period {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.sales-orders-kpis {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sales-orders-empty {
+  padding: var(--space-8) 0;
+}
+
+.sales-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sales-order {
+  padding: var(--space-4);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.sales-order-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-8);
+  margin-bottom: 12px;
+}
+
+.sales-order-id {
+  margin: 0;
+  font-weight: 700;
+}
+
+.sales-order-num {
+  font-family: var(--font-mono);
+}
+
+.sales-order-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  font-size: 14px;
+}
+
+.sales-order-meta div {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.sales-order-meta dt {
+  color: var(--ink-muted);
+}
+
+.sales-order-meta dd {
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.sales-order-total {
+  margin: 0 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.sales-order-lines .col-qty { width: 72px; }
+.sales-order-lines .col-amount { width: 112px; }
+.sales-order-lines .col-state { width: 200px; }
+
+.sales-order-lines td,
+.sales-order-lines th {
+  padding: var(--space-2) var(--space-4);
+}
+
+.sales-order-lines .amount {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+/* 商品別から開いたとき、その商品の行に印を付ける */
+.sales-order-lines tr.is-hit td {
+  background: var(--accent-soft);
+}
+
+.sales-order-lines tr.is-hit td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* キャンセル(請求なし)は請求しないので取り消し線 */
+.sales-order-lines tr.is-canceled .status-name {
+  color: var(--ink-muted);
+  text-decoration: line-through;
+}
+
+@media (max-width: 960px) {
+  .sales-order-total {
+    margin-left: 0;
+  }
+
+  .sales-order-lines .col-state { width: 140px; }
+}

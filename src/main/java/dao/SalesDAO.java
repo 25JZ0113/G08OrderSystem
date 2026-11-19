@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import model.Order;
 import model.OrderDetail;
 import model.SalesRow;
 import db.DBManager;
@@ -65,7 +66,9 @@ public class SalesDAO {
     public List<SalesRow> byDay(LocalDate from, LocalDate to) throws SQLException {
         Map<LocalDate, SalesRow> rows = new LinkedHashMap<>();
         for (LocalDate d = from; !d.isAfter(to); d = d.plusDays(1)) {
-            rows.put(d, new SalesRow(String.format("%02d/%02d", d.getMonthValue(), d.getDayOfMonth())));
+            SalesRow row = new SalesRow(String.format("%02d/%02d", d.getMonthValue(), d.getDayOfMonth()));
+            row.setKey(d.toString());
+            rows.put(d, row);
         }
         String sql =
                 """
@@ -108,8 +111,10 @@ public class SalesDAO {
     public List<SalesRow> byWeekday(LocalDate from, LocalDate to) throws SQLException {
         String[] names = { "月", "火", "水", "木", "金", "土", "日" };
         List<SalesRow> rows = new ArrayList<>();
-        for (String n : names) {
-            rows.add(new SalesRow(n));
+        for (int i = 0; i < names.length; i++) {
+            SalesRow row = new SalesRow(names[i]);
+            row.setKey(String.valueOf(i));   // 月=0 〜 日=6
+            rows.add(row);
         }
         // TRUNC(日付, 'IW') は その週の月曜日。差を取ると 月=0 〜 日=6 になる(言語の設定によらない)
         String sql =
@@ -152,7 +157,9 @@ public class SalesDAO {
     public List<SalesRow> byMonth(LocalDate from, LocalDate to) throws SQLException {
         Map<LocalDate, SalesRow> rows = new LinkedHashMap<>();
         for (LocalDate m = from.withDayOfMonth(1); !m.isAfter(to); m = m.plusMonths(1)) {
-            rows.put(m, new SalesRow(String.format("%d/%02d", m.getYear(), m.getMonthValue())));
+            SalesRow row = new SalesRow(String.format("%d/%02d", m.getYear(), m.getMonthValue()));
+            row.setKey(String.format("%d-%02d", m.getYear(), m.getMonthValue()));
+            rows.put(m, row);
         }
         String sql =
                 """
@@ -233,11 +240,97 @@ public class SalesDAO {
                 while (rs.next()) {
                     String size  = rs.getString("psize_name");
                     String label = rs.getString("pname") + (size == null ? "" : "(" + size + ")");
-                    rows.add(new SalesRow(label, 0, 0, rs.getInt("qty"), rs.getLong("amount")));
+                    SalesRow row = new SalesRow(label, 0, 0, rs.getInt("qty"), rs.getLong("amount"));
+                    row.setKey(String.valueOf(rs.getInt("pid")));
+                    rows.add(row);
                 }
             }
         }
         return rows;
+    }
+
+    /**
+     * A-06 売上の注文一覧:期間中に会計した注文を、会計した日時の順に返す(多すぎるときは max 件まで)
+     *
+     * @param weekday   曜日で絞るとき 0(月)〜6(日)。絞らないときは null
+     * @param productId この商品を含む注文に絞るとき商品 ID(キャンセル(請求なし)の明細は数えない)。絞らないときは null
+     * @param max       返す件数の上限
+     */
+    public List<Order> findOrders(LocalDate from, LocalDate to, Integer weekday, Integer productId, int max)
+            throws SQLException {
+        String sql =
+                """
+                SELECT
+                    o.id                AS oid,
+                    o.table_id          AS otable_id,
+                    o.guest_count       AS oguest_count,
+                    o.visit_datetime    AS ovisit_datetime,
+                    o.payment_datetime  AS opayment_datetime,
+                    o.payment_status    AS opayment_status,
+                    o.payment_method    AS opayment_method,
+                    o.total_amount      AS ototal_amount,
+                    t.table_no          AS ttable_no
+                FROM
+                    orders o
+                    JOIN tables t ON o.table_id = t.id
+                WHERE o.payment_status = ?
+                  AND o.payment_datetime >= ?
+                  AND o.payment_datetime <  ?
+                """;
+        if (weekday != null) {
+            // 売上の曜日別と同じ求め方(月=0 〜 日=6)
+            sql += """
+                  AND TRUNC(o.payment_datetime) - TRUNC(o.payment_datetime, 'IW') = ?
+                """;
+        }
+        if (productId != null) {
+            sql += """
+                  AND EXISTS (
+                      SELECT 1
+                      FROM order_details od
+                      WHERE od.order_id = o.id
+                        AND od.product_id = ?
+                        AND od.order_status <> ?
+                  )
+                """;
+        }
+        sql += """
+                ORDER BY o.payment_datetime, o.id
+                FETCH FIRST ? ROWS ONLY
+                """;
+
+        List<Order> orders = new ArrayList<>();
+        try (Connection con = DBManager.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            int i = 1;
+            ps.setString(i++, PAID);
+            ps.setTimestamp(i++, Timestamp.valueOf(from.atStartOfDay()));
+            ps.setTimestamp(i++, Timestamp.valueOf(to.plusDays(1).atStartOfDay()));
+            if (weekday != null) {
+                ps.setInt(i++, weekday);
+            }
+            if (productId != null) {
+                ps.setInt(i++, productId);
+                ps.setString(i++, OrderDetail.CANCELED_NO_CHARGE);
+            }
+            ps.setInt(i, max);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Order o = new Order();
+                    o.setId(rs.getInt("oid"));
+                    o.setTableId(rs.getInt("otable_id"));
+                    o.setTableNo(rs.getInt("ttable_no"));
+                    o.setGuestCount(rs.getInt("oguest_count"));
+                    o.setVisitDatetime(rs.getTimestamp("ovisit_datetime"));
+                    o.setPaymentDatetime(rs.getTimestamp("opayment_datetime"));
+                    o.setPaymentStatus(rs.getString("opayment_status"));
+                    o.setPaymentMethod(rs.getString("opayment_method"));
+                    o.setTotalAmount(rs.getInt("ototal_amount"));
+                    orders.add(o);
+                }
+            }
+        }
+        return orders;
     }
 
     /**

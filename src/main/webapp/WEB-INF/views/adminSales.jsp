@@ -84,8 +84,20 @@
             </thead>
             <tbody>
               <c:forEach var="r" items="${rows}">
-                <tr>
-                  <td><c:out value="${r.label}" /></td>
+                <%-- 売上がある行は、押すとその日・曜日・月・商品の注文一覧(A-06)を開く --%>
+                <c:url var="ordersUrl" value="/admin/sales/orders">
+                  <c:param name="from" value="${from}" /><c:param name="to" value="${to}" />
+                  <c:param name="view" value="${view}" /><c:param name="key" value="${r.key}" />
+                </c:url>
+                <tr class="${r.amount > 0 ? 'is-link' : ''}">
+                  <td>
+                    <c:choose>
+                      <c:when test="${r.amount > 0}">
+                        <a class="sales-row-link" href="${ordersUrl}" aria-label="<c:out value='${r.label}' />の注文を見る"><c:out value="${r.label}" /></a>
+                      </c:when>
+                      <c:otherwise><c:out value="${r.label}" /></c:otherwise>
+                    </c:choose>
+                  </td>
                   <td class="amount">${isProduct ? r.quantity : r.guests}${isProduct ? '' : '人'}</td>
                   <td class="amount"><fmt:formatNumber value="${r.amount}" />円</td>
                 </tr>
@@ -116,12 +128,23 @@
             <%-- 商品別:商品名が長いので横向きの棒。全商品を売上金額の多い順に出し、多いときは枠の中でスクロールする --%>
             <ul class="hbar-chart">
               <c:forEach var="r" items="${rows}">
-                <li class="hbar-row">
-                  <span class="hbar-label"><c:out value="${r.label}" /></span>
-                  <span class="hbar-track">
-                    <span class="hbar" style="width: ${r.barPercent}%"></span>
-                  </span>
-                  <span class="hbar-value"><fmt:formatNumber value="${r.amount}" />円</span>
+                <c:url var="ordersUrl" value="/admin/sales/orders">
+                  <c:param name="from" value="${from}" /><c:param name="to" value="${to}" />
+                  <c:param name="view" value="${view}" /><c:param name="key" value="${r.key}" />
+                </c:url>
+                <li>
+                  <%-- 売れた商品は、押すとその商品を含む注文一覧を開く --%>
+                  <c:choose>
+                    <c:when test="${r.amount > 0}"><c:set var="rowTag" value="a" /></c:when>
+                    <c:otherwise><c:set var="rowTag" value="span" /></c:otherwise>
+                  </c:choose>
+                  <${rowTag} class="hbar-row ${r.amount > 0 ? 'is-link' : ''}" <c:if test="${r.amount > 0}">href="${ordersUrl}" aria-label="<c:out value='${r.label}' /> <fmt:formatNumber value='${r.amount}' />円(注文を見る)"</c:if>>
+                    <span class="hbar-label"><c:out value="${r.label}" /></span>
+                    <span class="hbar-track">
+                      <span class="hbar" style="width: ${r.barPercent}%"></span>
+                    </span>
+                    <span class="hbar-value"><fmt:formatNumber value="${r.amount}" />円</span>
+                  </${rowTag}>
                 </li>
               </c:forEach>
             </ul>
@@ -135,8 +158,18 @@
             <div class="vbar-scroll ${isLong ? 'is-long' : ''}">
             <div class="vbar-chart" style="--bar-count: ${n}">
               <c:forEach var="r" items="${rows}" varStatus="st">
-                <div class="vbar-col" tabindex="0"
-                     aria-label="<c:out value='${r.label}' /> <fmt:formatNumber value='${r.amount}' />円">
+                <%-- 売上がある棒は、押すとその日・曜日・月の注文一覧を開く(売上がない棒は吹き出しだけ) --%>
+                <c:url var="ordersUrl" value="/admin/sales/orders">
+                  <c:param name="from" value="${from}" /><c:param name="to" value="${to}" />
+                  <c:param name="view" value="${view}" /><c:param name="key" value="${r.key}" />
+                </c:url>
+                <c:choose>
+                  <c:when test="${r.amount > 0}"><c:set var="colTag" value="a" /></c:when>
+                  <c:otherwise><c:set var="colTag" value="div" /></c:otherwise>
+                </c:choose>
+                <${colTag} class="vbar-col ${r.amount > 0 ? 'is-link' : ''}" tabindex="0"
+                     <c:if test="${r.amount > 0}">href="${ordersUrl}"</c:if>
+                     aria-label="<c:out value='${r.label}' /> <fmt:formatNumber value='${r.amount}' />円${r.amount > 0 ? '(注文を見る)' : ''}">
                   <span class="vbar-area">
                     <span class="vbar" style="height: ${r.barPercent}%"></span>
                   </span>
@@ -145,9 +178,9 @@
                   <span class="vbar-tip" role="tooltip">
                     <c:out value="${r.label}" /><br>
                     <strong><fmt:formatNumber value="${r.amount}" />円</strong><br>
-                    ${r.guests}人・${r.visits}組
+                    ${r.guests}人・${r.visits}組<c:if test="${r.amount > 0}"><br><span class="vbar-tip-hint">押すと注文を見られます</span></c:if>
                   </span>
-                </div>
+                </${colTag}>
               </c:forEach>
             </div>
             </div>
@@ -167,5 +200,16 @@
     <p class="admin-users-note">※会計済みの注文を、会計した日で集計しています(未会計の注文は入りません)。キャンセル(請求なし)の商品は売上に入れていません(キャンセル(請求あり)は入れています)。商品別には、期間中に売れていない商品も 0 円で表示しています。客単価・1来店あたり単価は円未満を切り捨てています</p>
   </c:if>
 </main>
+<script>
+// 表の行はどこを押しても、その行の注文一覧を開く(キーボードは行の中のリンクで操作する)
+document.querySelectorAll('.admin-sales-table tr.is-link').forEach(function (tr) {
+  tr.addEventListener('click', function (e) {
+    var a = tr.querySelector('a.sales-row-link');
+    if (a && e.target !== a) {
+      a.click();
+    }
+  });
+});
+</script>
 </body>
 </html>
