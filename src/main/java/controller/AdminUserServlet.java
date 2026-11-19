@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 
 import dao.UserDAO;
 import model.User;
+import util.PasswordUtil;
 
 /**
  * A-03 ユーザー管理画面(Controller)
@@ -152,6 +153,10 @@ public class AdminUserServlet extends HttpServlet {
         }
         if (password != null && password.length() < PASSWORD_MIN) {
             return "パスワードは" + PASSWORD_MIN + "文字以上で入力してください。";
+        }
+        // BCrypt は 72 バイトを超えた分を無視するので、長すぎるパスワードは受け付けない
+        if (password != null && !PasswordUtil.isWithinMaxBytes(password)) {
+            return "パスワードが長すぎます(半角 72 文字・全角 24 文字まで)。";
         }
         if (!User.ROLE_ADMIN.equals(form.getRole()) && !User.ROLE_STAFF.equals(form.getRole())) {
             return "権限を選んでください。";
