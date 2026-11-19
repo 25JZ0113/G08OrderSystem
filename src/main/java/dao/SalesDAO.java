@@ -192,28 +192,37 @@ public class SalesDAO {
     }
 
     /**
-     * 商品別:売上金額の多い順
+     * 商品別:売上金額の多い順(同じ金額はカテゴリ順・商品 ID 順)
+     * 期間中に売れていない商品も、数量 0・売上 0 円で出す(商品テーブルの全商品)
      * 取り消した商品は入れない。トッピングも 1 つの商品として数える
      */
     public List<SalesRow> byProduct(LocalDate from, LocalDate to) throws SQLException {
         String sql =
                 """
                 SELECT
-                    p.id                              AS pid,
-                    p.name                            AS pname,
-                    p.size_name                       AS psize_name,
-                    SUM(od.quantity)                  AS qty,
-                    SUM(od.sale_price * od.quantity)  AS amount
+                    p.id                   AS pid,
+                    p.name                 AS pname,
+                    p.size_name            AS psize_name,
+                    NVL(s.sqty, 0)         AS qty,
+                    NVL(s.samount, 0)      AS amount
                 FROM
-                    orders o
-                    JOIN order_details od ON od.order_id = o.id
-                    JOIN products p       ON od.product_id = p.id
-                WHERE od.order_status <> ?
-                  AND o.payment_status = ?
-                  AND o.payment_datetime >= ?
-                  AND o.payment_datetime <  ?
-                GROUP BY p.id, p.name, p.size_name
-                ORDER BY amount DESC, p.id
+                    products p
+                    LEFT JOIN (
+                        -- 期間中に売れた数量と金額(商品ごと)
+                        SELECT
+                            od.product_id                     AS sproduct_id,
+                            SUM(od.quantity)                  AS sqty,
+                            SUM(od.sale_price * od.quantity)  AS samount
+                        FROM
+                            orders o
+                            JOIN order_details od ON od.order_id = o.id
+                        WHERE od.order_status <> ?
+                          AND o.payment_status = ?
+                          AND o.payment_datetime >= ?
+                          AND o.payment_datetime <  ?
+                        GROUP BY od.product_id
+                    ) s ON s.sproduct_id = p.id
+                ORDER BY amount DESC, p.category_id, p.id
                 """;
 
         List<SalesRow> rows = new ArrayList<>();
