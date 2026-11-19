@@ -2087,34 +2087,85 @@ a {
   display: inline-block;
 }
 
-/* 日付を表示するボタン(入力欄と同じ見た目) */
+/* 日付の入力欄 + カレンダーを開くボタン(枠を 1 つにまとめ、入力欄と同じ見た目にする) */
 .cal-field {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
   height: 40px;
-  padding: 0 12px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+.cal-field:hover,
+.cal-field:focus-within {
+  border-color: var(--accent);
+}
+
+.cal-field:focus-within {
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* 読めない日付のとき */
+.cal-field.is-invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 1px var(--danger);
+}
+
+.cal-input {
+  width: 15.5ch;   /* 「2026/11/01(日)」が入る幅(曜日の漢字は 2 文字分) */
+  height: 100%;
+  padding: 0 4px 0 12px;
   font: inherit;
   font-family: var(--font-mono);
   color: var(--ink);
-  background: var(--paper-raised);
-  border: 1px solid var(--line-strong);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+
+.cal-input::placeholder {
+  color: var(--ink-muted);
+}
+
+.cal-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  margin-right: 3px;
+  padding: 0;
+  color: var(--accent);
+  background: transparent;
+  border: 0;
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
-.cal-field:hover {
-  border-color: var(--accent);
+.cal-toggle:hover,
+.cal-toggle[aria-expanded="true"] {
+  background: var(--accent-soft);
 }
 
-.cal-field[aria-expanded="true"] {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
+.cal-toggle:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
 }
 
-.cal-field-icon {
-  color: var(--accent);
-  flex-shrink: 0;
+/* 入力の誤りのメッセージ(入力欄の下に重ねて出し、並びを崩さない) */
+.cal-error {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 10;
+  font-size: 13px;
+  color: var(--danger);
+  white-space: nowrap;
+}
+
+.cal-error:empty {
+  display: none;
 }
 
 .cal-panel {
