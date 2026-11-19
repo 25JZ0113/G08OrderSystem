@@ -309,6 +309,7 @@
 </dialog>
 
 <script src="${ctx}/js/imageCrop.js"></script>
+<script src="${ctx}/js/select.js"></script>
 <script>
 <%-- 送信してエラーで戻ってきた画面(POST の結果)は、URL を GET の URL に置き換える。
      そのままだと再読み込みで同じフォームがもう一度送られ、画像だけが送られずに
