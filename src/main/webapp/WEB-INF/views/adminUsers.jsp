@@ -63,7 +63,7 @@
         <c:forEach var="u" items="${users}">
           <tr class="${u.id == form.id ? 'is-selected' : ''}">
             <td class="admin-users-login"><c:out value="${u.loginId}" /></td>
-            <td>
+            <td class="admin-users-name">
               <c:out value="${u.name}" />
               <c:if test="${u.id == sessionScope.loginUser.id}"><span class="admin-users-me">(自分)</span></c:if>
             </td>
