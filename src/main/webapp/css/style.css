@@ -1337,6 +1337,50 @@ a {
   outline-offset: 1px;
 }
 
+/*
+ * ドロップダウン(select)
+ * ブラウザ標準の矢印は OS によって見た目が違うので消して、入力欄と同じ見た目に右端の「∨」を描く。
+ * 矢印は 2 本の斜めのグラデーションで描く(色を変数にできるので、ダークモードでも色が合う)
+ */
+select.login-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 44px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-muted) 50%),
+    linear-gradient(135deg, var(--ink-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 22px) 50%,
+    calc(100% - 16px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+select.login-input:hover {
+  border-color: var(--accent);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--accent) 50%),
+    linear-gradient(135deg, var(--accent) 50%, transparent 50%);
+}
+
+select.login-input:focus-visible {
+  border-color: var(--accent);
+}
+
+select.login-input:disabled {
+  color: var(--ink-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 開いたときの一覧も、ページと同じ色にする(ダークモードで白い一覧にならないように) */
+select.login-input option {
+  color: var(--ink);
+  background: var(--paper-raised);
+}
+
 .login-submit {
   grid-column: 1 / -1;
   justify-self: center;
