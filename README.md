@@ -98,3 +98,4 @@ src/main/webapp/
 |---|---|---|
 | `src/main/java/db/DBManager.java` | 学校の Oracle の接続情報 | `DBManager.java.example` |
 | `src/main/webapp/WEB-INF/upload.properties` | 商品画像の保存先(PC ごとに違う) | `upload.properties.example` |
+| `CLAUDE.local.md` | Claude Code 用のメモ(資料の URL など) | なし(班内で共有) |
