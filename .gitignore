@@ -10,3 +10,6 @@ src/main/java/util/DBManager.java
 
 # 商品画像の保存先(PC ごとに違う)。upload.properties.example をコピーして作る
 src/main/webapp/WEB-INF/upload.properties
+
+# Claude Code の個人用メモ(資料の URL など、公開リポジトリに上げない情報)
+CLAUDE.local.md
